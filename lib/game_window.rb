@@ -1,6 +1,7 @@
 require "gosu"
 require_relative "../config/settings"
 require_relative "./paddle"
+require_relative "./ball"
 
 class GameWindow < Gosu::Window
   WIDTH  = Config::WINDOW_WIDTH
@@ -13,7 +14,7 @@ class GameWindow < Gosu::Window
     self.caption = Config::CAPTION
 
     @player = Paddle.new(200, 550)
-    @ball   = Ball.new(225, 500)
+    @ball   = Ball.new(225, 100)
   end
 
   def update
@@ -23,7 +24,8 @@ class GameWindow < Gosu::Window
     if Gosu.button_down?(Gosu::KB_RIGHT)
       @player.move_right
     end
-    # @ball.
+    @ball.gravity
+    @ball.bounce
   end
 
   def draw

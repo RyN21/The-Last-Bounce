@@ -1,9 +1,13 @@
 class Paddle
-  attr_reader :x, :y
-
+  attr_reader :x, :y, :width, :height
+  WIDTH  = 516
+  HEIGHT = 60
   def initialize(x, y)
     @x            = x
     @y            = y
+    @paddle_scale = 0.25
+    @width        = WIDTH * @paddle_scale
+    @height        = HEIGHT * @paddle_scale
     @paddle_speed = 4
     @x_vel_left   = @paddle_speed
     @x_vel_right  = @paddle_speed
@@ -15,7 +19,7 @@ class Paddle
   end
 
   def draw
-    @paddle.draw(x, y, 0, 0.25, 0.25)
+    @paddle.draw(x, y, 0, @paddle_scale, @paddle_scale)
   end
 
   def move_left

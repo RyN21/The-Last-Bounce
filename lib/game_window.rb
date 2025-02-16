@@ -13,24 +13,28 @@ class GameWindow < Gosu::Window
     super WIDTH, HEIGHT
     self.caption = Config::CAPTION
 
-    @player = Paddle.new(200, 550)
-    @ball   = Ball.new(225, 100)
+    @paddle = Paddle.new(200, 550)
+    @ball   = Ball.new(225, 100, @paddle)
   end
 
   def update
     if Gosu.button_down?(Gosu::KB_LEFT)
-      @player.move_left
+      @paddle.move_left
     end
     if Gosu.button_down?(Gosu::KB_RIGHT)
-      @player.move_right
+      @paddle.move_right
     end
-    @ball.gravity
-    @ball.bounce
+    case @ball.state
+    when :free_fall
+      @ball.gravity(@ball.x, @ball.y)
+    when :bouncing
+      @ball.bounce
+    end
   end
 
   def draw
     Gosu.draw_rect(0, 0, WIDTH, HEIGHT, COLOR, z = 0)
-    @player.draw
+    @paddle.draw
     @ball.draw
   end
 end

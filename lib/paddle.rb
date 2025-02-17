@@ -7,7 +7,7 @@ class Paddle
     @y            = y
     @paddle_scale = 0.25
     @width        = WIDTH * @paddle_scale
-    @height        = HEIGHT * @paddle_scale
+    @height       = HEIGHT * @paddle_scale
     @paddle_speed = 4
     @x_vel_left   = @paddle_speed
     @x_vel_right  = @paddle_speed

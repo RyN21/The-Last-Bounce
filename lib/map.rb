@@ -78,6 +78,20 @@ class Map
     return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
     @tiles[tile_x][tile_y] != nil
   end
+
+  def left_wall?(x, y)
+    tile_x = (x / TILE_SIZE).floor
+    tile_y = (y / TILE_SIZE).floor
+    return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
+    @tiles[tile_x][tile_y] != nil
+  end
+
+  def right_wall?(x, y)
+    tile_x = (x / TILE_SIZE).floor
+    tile_y = (y / TILE_SIZE).floor
+    return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
+    @tiles[tile_x][tile_y] != nil
+  end
 end
 
 

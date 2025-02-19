@@ -71,6 +71,11 @@ class Ball
     @x -= 2
   end
 
+  def hits_wall
+    @travel = :right if hits_left_wall?
+    @travel = :left if hits_right_wall?
+  end
+
   def hits_paddle?
     @travel = :left if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x - @width  && @x + @width / 2 <= @paddle.x + @paddle.width_third
     @travel = :right if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + @paddle.width_third * 2 - @width  && @x + @width / 2 <= @paddle.x + @paddle.width + @width
@@ -90,6 +95,18 @@ class Ball
     x = @x + @width / 2
     y = @y
     @map.tile_ceiling?(x, y)
+  end
+
+  def hits_left_wall?
+    x = @x
+    y = @y + @height / 2
+    @map.right_wall?(x, y)
+  end
+
+  def hits_right_wall?
+    x = @x + @width
+    y = @y + @height / 2
+    @map.left_wall?(x, y)
   end
 
   def free_fall?

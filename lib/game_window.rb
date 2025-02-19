@@ -31,6 +31,8 @@ class GameWindow < Gosu::Window
       @ball.gravity(@ball.x, @ball.y)
     when :bouncing
       @ball.bounce
+    when :hits_ceiling
+      @ball.bounce_off_ceiling
     end
     @camera_x = [[@paddle.x - WIDTH / 2, 0].max, @map.width * 50 - WIDTH].min
     @camera_y = [[@paddle.y - HEIGHT / 2, 0].max, @map.height * 50 - HEIGHT].min

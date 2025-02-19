@@ -46,15 +46,29 @@ class Ball
     @gravity_vel = 0.25
     @bounce_vel -= 0.25
     @y -= @bounce_vel
-    @state = :free_fall if @bounce_vel == 0 || hits_ceiling?
+    @state = :free_fall if @bounce_vel == 0
+    @state = :hits_ceiling if hits_ceiling?
+  end
+
+  def bounce_off_ceiling
+    case @travel
+    when :left
+      travel_left
+    when :right
+      travel_left
+    end
+    @gravity_vel = @bounce_vel
+    @gravity_vel += 0.1
+    @y += @gravity_vel
+    @state = :free_fall
   end
 
   def travel_right
-    @x += 3
+    @x += 2
   end
 
   def travel_left
-    @x -= 3
+    @x -= 2
   end
 
   def hits_paddle?

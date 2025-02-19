@@ -2,6 +2,7 @@ require "gosu"
 require_relative "../config/settings"
 require_relative "./paddle"
 require_relative "./ball"
+require_relative "./map"
 
 class GameWindow < Gosu::Window
   WIDTH  = Config::WINDOW_WIDTH
@@ -12,9 +13,10 @@ class GameWindow < Gosu::Window
   def initialize
     super WIDTH, HEIGHT
     self.caption = Config::CAPTION
-
+    @map    = Map.new("assets/maps/1.txt")
     @paddle = Paddle.new(200, 550)
-    @ball   = Ball.new(225, 100, @paddle)
+    @ball   = Ball.new(225, 100, @paddle, @map)
+    @camera_x = @camera_y = 0
   end
 
   def update
@@ -30,12 +32,17 @@ class GameWindow < Gosu::Window
     when :bouncing
       @ball.bounce
     end
+    @camera_x = [[@paddle.x - WIDTH / 2, 0].max, @map.width * 50 - WIDTH].min
+    @camera_y = [[@paddle.y - HEIGHT / 2, 0].max, @map.height * 50 - HEIGHT].min
   end
 
   def draw
     Gosu.draw_rect(0, 0, WIDTH, HEIGHT, COLOR, z = 0)
-    @paddle.draw
-    @ball.draw
+    @map.draw(@camera_x, @camera_y, WIDTH, HEIGHT)
+    Gosu.translate(-@camera_x, -@camera_y) do
+      @paddle.draw
+      @ball.draw
+    end
   end
 end
 

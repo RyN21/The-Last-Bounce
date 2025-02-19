@@ -2,8 +2,9 @@ class Ball
   WIDTH  = 70
   HEIGHT = 70
   attr_reader :x, :y, :state
-  def initialize(x, y, paddle)
+  def initialize(x, y, paddle, map)
     @paddle          = paddle
+    @map             = map
     @x               = x
     @y               = y
     @ball_scale      = 0.50
@@ -32,7 +33,7 @@ class Ball
     @bounce_vel = 13
     @gravity_vel += 0.1
     @y += @gravity_vel
-    @state = :bouncing if hits_paddle?
+    @state = :bouncing if hits_paddle? || lands_on_tile?
   end
 
   def bounce
@@ -45,24 +46,36 @@ class Ball
     @gravity_vel = 0.25
     @bounce_vel -= 0.25
     @y -= @bounce_vel
-    @state = :free_fall if @bounce_vel == 0
+    @state = :free_fall if @bounce_vel == 0 || hits_ceiling?
   end
 
   def travel_right
-    @x += 2
+    @x += 3
   end
 
   def travel_left
-    @x -= 2
+    @x -= 3
   end
 
   def hits_paddle?
-    @travel = :left if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x - @width  && @x + @width / 2 <= @paddle.x + 43
-    @travel = :right if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + 86 - @width  && @x + @width / 2 <= @paddle.x + @paddle.width + @width
-    @travel = :none if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + 43  && @x + @width / 2 <= @paddle.x + 86
+    @travel = :left if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x - @width  && @x + @width / 2 <= @paddle.x + @paddle.width_third
+    @travel = :right if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + @paddle.width_third * 2 - @width  && @x + @width / 2 <= @paddle.x + @paddle.width + @width
+    @travel = :none if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + @paddle.width_third  && @x + @width / 2 <= @paddle.x + @paddle.width_third * 2
 
     @y + @height >= @paddle.y && @x > @paddle.x - @width  && @x + @width < @paddle.x + @paddle.width + @width
     # @travel = :none if @y + @height >= @paddle.y && @x > @paddle.x - @width  && @x + @width < @paddle.x + @paddle.width + @width
+  end
+
+  def lands_on_tile?
+    x = @x + @width / 2
+    y = @y + @height
+    @map.tile_floor?(x, y)
+  end
+
+  def hits_ceiling?
+    x = @x + @width / 2
+    y = @y
+    @map.tile_ceiling?(x, y)
   end
 
   def free_fall?

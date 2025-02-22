@@ -1,6 +1,7 @@
 class Ball
   WIDTH  = 70
   HEIGHT = 70
+  RADIUS = 35
   attr_reader :x, :y, :state
   def initialize(x, y, paddle, map)
     @paddle          = paddle
@@ -10,17 +11,30 @@ class Ball
     @ball_scale      = 0.50
     @width           = WIDTH * @ball_scale
     @height          = HEIGHT * @ball_scale
+    @radius          = RADIUS * @ball_scale
     @gravity_vel     = 0.25
     @bounce_vel      = 13
-    @vel_decrem      = 1
+    @travel_vel      = 0.0
     @on_solid_object = false
     @ball            = Gosu::Image.new("assets/images/ball.png")
     @state           = :free_fall
     @travel          = :none
   end
 
+  def update
+    case @state
+    when :free_fall
+      gravity(@x, @y)
+    when :bouncing
+      bounce
+    when :hits_ceiling
+      bounce_off_ceiling
+    end
+    hits_wall
+  end
+
   def draw
-    @ball.draw(x, y, 0, @ball_scale, @ball_scale)
+    @ball.draw(@x, @y, 0, @ball_scale, @ball_scale)
   end
 
   def gravity(x, y)
@@ -64,22 +78,75 @@ class Ball
   end
 
   def travel_right
-    @x += 2
+    @x += @travel_vel
   end
 
   def travel_left
-    @x -= 2
+    @x += @travel_vel
   end
 
   def hits_wall
-    @travel = :right if hits_left_wall?
-    @travel = :left if hits_right_wall?
+    if hits_left_wall?
+      @travel = :right
+      @travel_vel = -@travel_vel
+    end
+    if hits_right_wall?
+      @travel = :left
+      @travel_vel = -@travel_vel
+    end
+  end
+
+  def hits_corner
+    if hits_corner_tile?
+      case @travel
+      when :right
+        @travel = :left
+      when :left
+        @travel = :right
+      when :none
+        @travel = :none
+      end
+    end
   end
 
   def hits_paddle?
-    @travel = :left if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x - @width  && @x + @width / 2 <= @paddle.x + @paddle.width_third
-    @travel = :right if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + @paddle.width_third * 2 - @width  && @x + @width / 2 <= @paddle.x + @paddle.width + @width
-    @travel = :none if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + @paddle.width_third  && @x + @width / 2 <= @paddle.x + @paddle.width_third * 2
+    if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x - @width  && @x + @width / 2 <= @paddle.x + @paddle.width_third
+      case @travel  # HITS LeFT SIDE OF PADDLE
+      when :left
+        @travel_vel -= 1
+      when :right
+        @travel = :none
+        @travel_vel = 0
+      when :none
+        @travel_vel -= 1
+        @travel = :left
+      end
+    end
+    if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + @paddle.width_third * 2 - @width  && @x + @width / 2 <= @paddle.x + @paddle.width + @width
+      case @travel  # HITS RIGHT SIDE OF PADDLE
+      when :right
+        @travel_vel += 1 if @travel_vel < 5
+      when :left
+        @travel = :none
+        @travel_vel = 0
+      when :none
+        @travel_vel += 1
+        @travel = :right
+      end
+    end
+    if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + @paddle.width_third  && @x + @width / 2 <= @paddle.x + @paddle.width_third * 2
+      case @travel  # HITS MIDDLE OF PADDLE
+      when :none
+        @travel_vel = 0
+      when :left
+        @travel_vel += 1
+        @travel = :none if @travel_vel == 0
+      when :right
+        @travel_vel -= 1
+        @travel = :none if @travel_vel == 0
+
+      end
+    end
 
     @y + @height >= @paddle.y && @x > @paddle.x - @width  && @x + @width < @paddle.x + @paddle.width + @width
     # @travel = :none if @y + @height >= @paddle.y && @x > @paddle.x - @width  && @x + @width < @paddle.x + @paddle.width + @width
@@ -88,25 +155,35 @@ class Ball
   def lands_on_tile?
     x = @x + @width / 2
     y = @y + @height
-    @map.tile_floor?(x, y)
+    @map.hits_tile?(x, y)
   end
 
   def hits_ceiling?
     x = @x + @width / 2
     y = @y
-    @map.tile_ceiling?(x, y)
+    @map.hits_tile?(x, y)
   end
 
   def hits_left_wall?
     x = @x
     y = @y + @height / 2
-    @map.right_wall?(x, y)
+    @map.hits_tile?(x, y)
   end
 
   def hits_right_wall?
     x = @x + @width
     y = @y + @height / 2
-    @map.left_wall?(x, y)
+    @map.hits_tile?(x, y)
+  end
+
+  def hits_corner_tile?
+    corners = [[@x, @y],
+      [@x, @y + @width],
+      [@x + @height, @y],
+      [@x + @height, @y + @width]]
+    coeners.any? do |coord|
+      @map.hits_tile?(coord[0], coord[1])
+    end
   end
 
   def free_fall?
@@ -117,3 +194,6 @@ class Ball
     @state == :bouncing
   end
 end
+
+
+# UPDATE balss travel distance / velocity whenever it hits the paddle

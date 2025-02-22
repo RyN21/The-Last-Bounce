@@ -3,6 +3,7 @@ require_relative "../config/settings"
 require_relative "./paddle"
 require_relative "./ball"
 require_relative "./map"
+require_relative "./collectible_gem"
 
 class GameWindow < Gosu::Window
   WIDTH  = Config::WINDOW_WIDTH
@@ -13,9 +14,10 @@ class GameWindow < Gosu::Window
   def initialize
     super WIDTH, HEIGHT
     self.caption = Config::CAPTION
+    Gosu.enable_undocumented_retrofication
     @map    = Map.new("assets/maps/1.txt")
-    @paddle = Paddle.new(200, 550)
-    @ball   = Ball.new(225, 100, @paddle, @map)
+    @paddle = Paddle.new(200, 550, @map)
+    @ball   = Ball.new(225, 300, @paddle, @map)
     @camera_x = @camera_y = 0
   end
 
@@ -26,17 +28,10 @@ class GameWindow < Gosu::Window
     if Gosu.button_down?(Gosu::KB_RIGHT)
       @paddle.move_right
     end
-    case @ball.state
-    when :free_fall
-      @ball.gravity(@ball.x, @ball.y)
-    when :bouncing
-      @ball.bounce
-    when :hits_ceiling
-      @ball.bounce_off_ceiling
-    end
-    @ball.hits_wall
-    @camera_x = [[@paddle.x - WIDTH / 2, 0].max, @map.width * 50 - WIDTH].min
-    @camera_y = [[@paddle.y - HEIGHT / 2, 0].max, @map.height * 50 - HEIGHT].min
+    @ball.update
+    @map.update
+    @camera_x = [[@paddle.x - WIDTH / 2.5, 0].max, @map.width * 50 - WIDTH].min
+    @camera_y = [[@paddle.y - HEIGHT / 2.5, 0].max, @map.height * 50 - HEIGHT].min
   end
 
   def draw

@@ -21,6 +21,6 @@ class CollectibleGem
   def draw(camera_x, camera_y)
     screen_x = @x - camera_x
     screen_y = @y - camera_y
-    @frames[@current_frame].draw_rot(screen_x, screen_y, 0, 25 * Math.sin(Gosu.milliseconds / 133.7), 0.5, 0.5, 1.5, 1.5)
+    @frames[@current_frame].draw_rot(screen_x, screen_y, 0, 25 * Math.sin(Gosu.milliseconds / 133.7), 0.5, 0.5, 1.75, 1.75)
   end
 end

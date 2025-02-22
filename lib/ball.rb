@@ -50,6 +50,12 @@ class Ball
     @state = :bouncing if hits_paddle? || lands_on_tile?
   end
 
+  def reset_ball(x)
+    @x = x
+    @y = 300
+    @gravity_vel = 0.25
+  end
+
   def bounce
     case @travel
     when :left

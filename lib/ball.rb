@@ -52,8 +52,10 @@ class Ball
 
   def reset_ball(x)
     @x = x
-    @y = 300
+    @y = 100
     @gravity_vel = 0.25
+    @travel = :left
+    @travel_vel = -2
   end
 
   def bounce

@@ -184,19 +184,19 @@ class Ball
     @map.hits_tile?(x, y)
   end
 
-  def hits_corner_tile?
-    corners = [[@x, @y],
-      [@x, @y + @width],
-      [@x + @height, @y],
-      [@x + @height, @y + @width]]
-    coeners.any? do |coord|
-      @map.hits_tile?(coord[0], coord[1])
-    end
+  def other_collision?
+    # corners = [[@x, @y],
+    #   [@x, @y + @width],
+    #   [@x + @height, @y],
+    #   [@x + @height, @y + @width]]
+    # coeners.any? do |coord|
+    #   @map.hits_tile?(coord[0], coord[1])
+    # end
   end
 
   def collect_gems(gems)
     gems.reject! do |gem|
-      (gem.x - @x).abs < 15 && (gem.y - @y).abs < 15
+      ((gem.x + 16) - (@x + @radius)).abs < 15 && ((gem.y + 16) - (@y + @radius)).abs < 15
     end
   end
 end

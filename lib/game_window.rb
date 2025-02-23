@@ -33,6 +33,7 @@ class GameWindow < Gosu::Window
     @camera_x = [[@paddle.x - WIDTH / 2.5, 0].max, @map.width * 50 - WIDTH].min
     @camera_y = [[@paddle.y - HEIGHT / 2.5, 0].max, @map.height * 50 - HEIGHT].min
     @ball.reset_ball(@paddle.x) if @ball.y > HEIGHT
+    @ball.collect_gems(@map.gems)
   end
 
   def draw

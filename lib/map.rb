@@ -1,7 +1,7 @@
 TILE_SIZE = 50
 
 class Map
-  attr_reader :width, :height
+  attr_reader :width, :height, :gems
   def initialize(filename)
     @tile_images = {
       [:west]     => Gosu::Image.new("assets/tiles/left.png"),

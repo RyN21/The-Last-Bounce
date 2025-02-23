@@ -37,6 +37,14 @@ class Ball
     @ball.draw(@x, @y, 0, @ball_scale, @ball_scale)
   end
 
+  def reset_ball(x)
+    @x = x
+    @y = 100
+    @gravity_vel = 0.25
+    @travel = :left
+    @travel_vel = -2
+  end
+
   def gravity(x, y)
     case @travel
     when :left
@@ -48,14 +56,6 @@ class Ball
     @gravity_vel += 0.1
     @y += @gravity_vel
     @state = :bouncing if hits_paddle? || lands_on_tile?
-  end
-
-  def reset_ball(x)
-    @x = x
-    @y = 100
-    @gravity_vel = 0.25
-    @travel = :left
-    @travel_vel = -2
   end
 
   def bounce
@@ -194,12 +194,10 @@ class Ball
     end
   end
 
-  def free_fall?
-    @state == :free_fall
-  end
-
-  def bouncing?
-    @state == :bouncing
+  def collect_gems(gems)
+    gems.reject! do |gem|
+      (gem.x - @x).abs < 15 && (gem.y - @y).abs < 15
+    end
   end
 end
 

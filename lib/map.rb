@@ -76,9 +76,24 @@ class Map
     return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
     @tiles[tile_x][tile_y] != nil
   end
+
+  def corner_hits_tile?(x, y)
+    tile_x = (x / TILE_SIZE).floor
+    tile_y = (y / TILE_SIZE).floor
+    if Gosu.distance(tile_x, tile_y, x, y) < 40
+      true
+    else
+      false
+    end
+  end
 end
 
 
+# def tile_type(x, y)
+#   tile_x = (x / TILE_SIZE).floor
+#   tile_y = (y / TILE_SIZE).floor
+#   @tiles[tile_x][tile_y] if @tiles[tile_x][tile_y] != nil
+# end
 
 # image_path  = Config::GRASS_TILES_IMAGES[walls.sort] || "assets/tiles/grass_tiles/plain_grass.png"
 # @tile_image = Gosu::Image.new(image_path)

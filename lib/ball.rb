@@ -14,7 +14,7 @@ class Ball
     @radius          = RADIUS * @ball_scale
     @gravity_vel     = 0.25
     @bounce_vel      = 13
-    @travel_vel      = 0.0
+    @travel_vel      = 0
     @on_solid_object = false
     @ball            = Gosu::Image.new("assets/images/ball.png")
     @state           = :free_fall
@@ -31,6 +31,8 @@ class Ball
       bounce_off_ceiling
     end
     hits_wall
+    hits_corner
+    travel
   end
 
   def draw
@@ -43,6 +45,12 @@ class Ball
     @gravity_vel = 0.25
     @travel = :left
     @travel_vel = -2
+  end
+
+  def travel
+    @travel = :none if @travel_vel == 0
+    @travel = :left if @travel_vel < 0
+    @travel = :right if @travel_vel > 0
   end
 
   def gravity(x, y)
@@ -95,69 +103,37 @@ class Ball
 
   def hits_wall
     if hits_left_wall?
-      @travel = :right
       @travel_vel = -@travel_vel
     end
     if hits_right_wall?
-      @travel = :left
       @travel_vel = -@travel_vel
     end
   end
 
   def hits_corner
     if hits_corner_tile?
-      case @travel
-      when :right
-        @travel = :left
-      when :left
-        @travel = :right
-      when :none
-        @travel = :none
+      case @state
+      when :free_fall
+        hits_wall
+      when :bouncing
+        hits_wall
       end
     end
   end
 
   def hits_paddle?
-    if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x - @width  && @x + @width / 2 <= @paddle.x + @paddle.width_third
-      case @travel  # HITS LeFT SIDE OF PADDLE
-      when :left
-        @travel_vel -= 1
-      when :right
-        @travel = :none
-        @travel_vel = 0
-      when :none
-        @travel_vel -= 1
-        @travel = :left
-      end
-    end
-    if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + @paddle.width_third * 2 - @width  && @x + @width / 2 <= @paddle.x + @paddle.width + @width
-      case @travel  # HITS RIGHT SIDE OF PADDLE
-      when :right
-        @travel_vel += 1 if @travel_vel < 5
-      when :left
-        @travel = :none
-        @travel_vel = 0
-      when :none
-        @travel_vel += 1
-        @travel = :right
-      end
-    end
-    if @y + @height >= @paddle.y && @x + @width / 2 >= @paddle.x + @paddle.width_third  && @x + @width / 2 <= @paddle.x + @paddle.width_third * 2
-      case @travel  # HITS MIDDLE OF PADDLE
-      when :none
-        @travel_vel = 0
-      when :left
-        @travel_vel += 1
-        @travel = :none if @travel_vel == 0
-      when :right
-        @travel_vel -= 1
-        @travel = :none if @travel_vel == 0
+    if @y + @height >= @paddle.y && @x + @width > @paddle.x && @x < @paddle.x + @paddle.width
+      paddle_center = @paddle.x + @paddle.width / 2
+      ball_center = @x + @radius
+      hit_position = (ball_center - paddle_center) / (@paddle.width / 2.0)
 
-      end
-    end
+      @travel_vel = hit_position * 5  # Adjust this multiplier to change the maximum horizontal velocity
+      @travel_vel = @travel_vel.clamp(-4, 4)  # Limit the horizontal velocity
 
-    @y + @height >= @paddle.y && @x > @paddle.x - @width  && @x + @width < @paddle.x + @paddle.width + @width
-    # @travel = :none if @y + @height >= @paddle.y && @x > @paddle.x - @width  && @x + @width < @paddle.x + @paddle.width + @width
+      true
+    else
+      false
+    end
   end
 
   def lands_on_tile?
@@ -184,19 +160,22 @@ class Ball
     @map.hits_tile?(x, y)
   end
 
-  def other_collision?
-    # corners = [[@x, @y],
-    #   [@x, @y + @width],
-    #   [@x + @height, @y],
-    #   [@x + @height, @y + @width]]
-    # coeners.any? do |coord|
-    #   @map.hits_tile?(coord[0], coord[1])
+  def hits_corner_tile?
+    x = @x + @radius
+    y = @y + @radius
+    @map.corner_hits_tile?(x, y)
+    # corners = [[@x + 5, @y + 5],
+    #   [@x + 5, @y - 5 + @width],
+    #   [@x - 5 + @height, @y + 5],
+    #   [@x - 5 + @height, @y - 5 + @width]]
+    # corners.any? do |coord|
+    #   @map.corner_hits_tile?(coord[0], coord[1])
     # end
   end
 
   def collect_gems(gems)
     gems.reject! do |gem|
-      ((gem.x + 16) - (@x + @radius)).abs < 15 && ((gem.y + 16) - (@y + @radius)).abs < 15
+      ((gem.x + 16) - (@x + @radius)).abs < 15 && ((gem.y + 16) - (@y + @radius)).abs < 40
     end
   end
 end

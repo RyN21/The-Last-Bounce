@@ -16,8 +16,9 @@ class BreakableTile
 
   def state_update
     @state = :good if @hit_count == 0
-    @state = :cracked if @hit_count == 1
-    @state = :destroyed if @hit_count == 2
+    @state = :cracked_1 if @hit_count == 1
+    @state = :cracked_2 if @hit_count == 2
+    @state = :destroyed if @hit_count == 3
   end
 
   def destroyed?

@@ -107,8 +107,15 @@ class Map
               0
             )
           end
-          if tile.state == :cracked
+          if tile.state == :cracked_1
             tile.image[1].draw(
+              x * TILE_SIZE - camera_x - 5,
+              y * TILE_SIZE - camera_y - 5,
+              0
+            )
+          end
+          if tile.state == :cracked_2
+            tile.image[2].draw(
               x * TILE_SIZE - camera_x - 5,
               y * TILE_SIZE - camera_y - 5,
               0

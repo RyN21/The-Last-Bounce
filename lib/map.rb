@@ -4,12 +4,22 @@ class Map
   attr_reader :width, :height, :gems
   def initialize(filename)
     @tile_images = {
-      [:west]     => Gosu::Image.new("assets/tiles/left.png"),
-      [:east]     => Gosu::Image.new("assets/tiles/right.png"),
+      [:top]    => Gosu::Image.new("assets/tiles/top.png"),
+      [:bottom]    => Gosu::Image.new("assets/tiles/bottom.png"),
+      [:left]     => Gosu::Image.new("assets/tiles/left.png"),
+      [:right]     => Gosu::Image.new("assets/tiles/right.png"),
       [:plain]    => Gosu::Image.new("assets/tiles/plain.png"),
-      [:left_tb]  => Gosu::Image.new("assets/tiles/left_tb.png"),
-      [:right_tb] => Gosu::Image.new("assets/tiles/right_tb.png"),
-      [:tb]       => Gosu::Image.new("assets/tiles/top_bottom.png")
+      [:all_side] => Gosu::Image.new("assets/tiles/all_sides.png"),
+      [:left_tb]      => Gosu::Image.new("assets/tiles/left_tb.png"),
+      [:right_tb]     => Gosu::Image.new("assets/tiles/right_tb.png"),
+      [:top_sides]    => Gosu::Image.new("assets/tiles/top_sides.png"),
+      [:bottom_sides] => Gosu::Image.new("assets/tiles/bottom_sides.png"),
+      [:corner_bl]      => Gosu::Image.new("assets/tiles/corner_bottom_left.png"),
+      [:corner_br]     => Gosu::Image.new("assets/tiles/corner_bottom_right.png"),
+      [:corner_tl]    => Gosu::Image.new("assets/tiles/corner_top_left.png"),
+      [:corner_tr] => Gosu::Image.new("assets/tiles/corner_top_right.png"),
+      [:lr] => Gosu::Image.new("assets/tiles/left_right.png"),
+      [:tb]           => Gosu::Image.new("assets/tiles/top_bottom.png")
     }
     gem_frames = Gosu::Image.load_tiles("assets/images/green_gem.png", 16, 16, retro: true)
     lines      = File.readlines(filename).map { |line| line.chomp }
@@ -19,20 +29,40 @@ class Map
     @tiles     = Array.new(@width) do |x|
       Array.new(@height) do |y|
         case lines[y][x, 1]
-        when "x"
-          [:east]
-        when "v"
-          [:west]
-        when "#"
+        when "t"
+          [:top]
+        when "b"
+          [:bottom]
+        when "r"
+          [:right]
+        when "l"
+          [:left]
+        when "P"
           [:plain]
         when "<"
           [:left_tb]
         when ">"
           [:right_tb]
+        when "V"
+          [:bottom_sides]
+        when "A"
+          [:top_sides]
         when "="
           [:tb]
+        when "H"
+          [:lr]
+        when "#"
+          [:all_side]
+        when "F"
+          [:corner_tl]
+        when "7"
+          [:corner_tr]
+        when "L"
+          [:corner_bl]
+        when "4"
+          [:corner_br]
         when "g"
-          @gems.push(CollectibleGem.new(gem_frames, x * 50 + 25, y * 50 + 25))
+          @gems.push(CollectibleGem.new(gem_frames, x * 50 + 25, y * 50 + 15))
           nil
         else
           nil
@@ -75,16 +105,6 @@ class Map
     tile_y = (y / TILE_SIZE).floor
     return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
     @tiles[tile_x][tile_y] != nil
-  end
-
-  def corner_hits_tile?(x, y)
-    tile_x = (x / TILE_SIZE).floor
-    tile_y = (y / TILE_SIZE).floor
-    if Gosu.distance(tile_x, tile_y, x, y) < 40
-      true
-    else
-      false
-    end
   end
 end
 

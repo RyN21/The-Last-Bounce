@@ -24,14 +24,13 @@ class Ball
   def update
     case @state
     when :free_fall
-      gravity(@x, @y)
+      gravity
     when :bouncing
       bounce
     when :hits_ceiling
       bounce_off_ceiling
     end
     hits_wall
-    hits_corner
     travel
   end
 
@@ -53,7 +52,7 @@ class Ball
     @travel = :right if @travel_vel > 0
   end
 
-  def gravity(x, y)
+  def gravity
     case @travel
     when :left
       travel_left
@@ -110,17 +109,6 @@ class Ball
     end
   end
 
-  def hits_corner
-    if hits_corner_tile?
-      case @state
-      when :free_fall
-        hits_wall
-      when :bouncing
-        hits_wall
-      end
-    end
-  end
-
   def hits_paddle?
     if @y + @height >= @paddle.y && @x + @width > @paddle.x && @x < @paddle.x + @paddle.width
       paddle_center = @paddle.x + @paddle.width / 2
@@ -160,22 +148,9 @@ class Ball
     @map.hits_tile?(x, y)
   end
 
-  def hits_corner_tile?
-    x = @x + @radius
-    y = @y + @radius
-    @map.corner_hits_tile?(x, y)
-    # corners = [[@x + 5, @y + 5],
-    #   [@x + 5, @y - 5 + @width],
-    #   [@x - 5 + @height, @y + 5],
-    #   [@x - 5 + @height, @y - 5 + @width]]
-    # corners.any? do |coord|
-    #   @map.corner_hits_tile?(coord[0], coord[1])
-    # end
-  end
-
   def collect_gems(gems)
     gems.reject! do |gem|
-      ((gem.x + 16) - (@x + @radius)).abs < 15 && ((gem.y + 16) - (@y + @radius)).abs < 40
+      ((gem.x) - (@x + @radius)).abs < 20 && ((gem.y) - (@y + @radius)).abs < 20
     end
   end
 end

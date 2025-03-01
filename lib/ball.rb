@@ -110,7 +110,7 @@ class Ball
   end
 
   def hits_paddle?
-    if @y + @height >= @paddle.y && @x + @width > @paddle.x && @x < @paddle.x + @paddle.width
+    if @y + @height >= @paddle.y  && @y + @height <= @paddle.y + @paddle.height && @x + @width > @paddle.x && @x < @paddle.x + @paddle.width
       paddle_center = @paddle.x + @paddle.width / 2
       ball_center = @x + @radius
       hit_position = (ball_center - paddle_center) / (@paddle.width / 2.0)

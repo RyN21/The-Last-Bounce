@@ -127,24 +127,28 @@ class Ball
   def lands_on_tile?
     x = @x + @width / 2
     y = @y + @height
+    # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 
   def hits_ceiling?
     x = @x + @width / 2
     y = @y
+    # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 
   def hits_left_wall?
     x = @x
     y = @y + @height / 2
+    # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 
   def hits_right_wall?
     x = @x + @width
     y = @y + @height / 2
+    # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 

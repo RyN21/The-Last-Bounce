@@ -1,32 +1,34 @@
 TILE_SIZE = 50
 
 class Map
-  attr_reader :width, :height, :gems
+  attr_reader :width, :height, :gems, :tiles, :breakable_tiles
   def initialize(filename)
     @tile_images = {
-      [:top]    => Gosu::Image.new("assets/tiles/top.png"),
-      [:bottom]    => Gosu::Image.new("assets/tiles/bottom.png"),
-      [:left]     => Gosu::Image.new("assets/tiles/left.png"),
-      [:right]     => Gosu::Image.new("assets/tiles/right.png"),
-      [:plain]    => Gosu::Image.new("assets/tiles/plain.png"),
-      [:all_side] => Gosu::Image.new("assets/tiles/all_sides.png"),
+      [:top]          => Gosu::Image.new("assets/tiles/top.png"),
+      [:bottom]       => Gosu::Image.new("assets/tiles/bottom.png"),
+      [:left]         => Gosu::Image.new("assets/tiles/left.png"),
+      [:right]        => Gosu::Image.new("assets/tiles/right.png"),
+      [:plain]        => Gosu::Image.new("assets/tiles/plain.png"),
+      [:all_side]     => Gosu::Image.new("assets/tiles/all_sides.png"),
       [:left_tb]      => Gosu::Image.new("assets/tiles/left_tb.png"),
       [:right_tb]     => Gosu::Image.new("assets/tiles/right_tb.png"),
       [:top_sides]    => Gosu::Image.new("assets/tiles/top_sides.png"),
       [:bottom_sides] => Gosu::Image.new("assets/tiles/bottom_sides.png"),
-      [:corner_bl]      => Gosu::Image.new("assets/tiles/corner_bottom_left.png"),
-      [:corner_br]     => Gosu::Image.new("assets/tiles/corner_bottom_right.png"),
+      [:corner_bl]    => Gosu::Image.new("assets/tiles/corner_bottom_left.png"),
+      [:corner_br]    => Gosu::Image.new("assets/tiles/corner_bottom_right.png"),
       [:corner_tl]    => Gosu::Image.new("assets/tiles/corner_top_left.png"),
-      [:corner_tr] => Gosu::Image.new("assets/tiles/corner_top_right.png"),
-      [:lr] => Gosu::Image.new("assets/tiles/left_right.png"),
+      [:corner_tr]    => Gosu::Image.new("assets/tiles/corner_top_right.png"),
+      [:lr]           => Gosu::Image.new("assets/tiles/left_right.png"),
       [:tb]           => Gosu::Image.new("assets/tiles/top_bottom.png")
+      # [:breakable]    => Gosu::Image.new("assets/tiles/breakable_tile_1.png")
     }
-    gem_frames = Gosu::Image.load_tiles("assets/images/green_gem.png", 16, 16, retro: true)
-    lines      = File.readlines(filename).map { |line| line.chomp }
-    @height    = lines.size
-    @width     = lines[0].size
-    @gems      = []
-    @tiles     = Array.new(@width) do |x|
+    gem_frames       = Gosu::Image.load_tiles("assets/images/green_gem.png", 16, 16, retro: true)
+    lines            = File.readlines(filename).map { |line| line.chomp }
+    @height          = lines.size
+    @width           = lines[0].size
+    @gems            = []
+    @breakable_tiles = []
+    @tiles           = Array.new(@width) do |x|
       Array.new(@height) do |y|
         case lines[y][x, 1]
         when "t"
@@ -37,7 +39,7 @@ class Map
           [:right]
         when "l"
           [:left]
-        when "P"
+        when "p"
           [:plain]
         when "<"
           [:left_tb]
@@ -61,8 +63,12 @@ class Map
           [:corner_bl]
         when "4"
           [:corner_br]
+        when "B"
+          tile = BreakableTile.new(x, y)
+          @breakable_tiles << tile
+          tile
         when "g"
-          @gems.push(CollectibleGem.new(gem_frames, x * 50 + 25, y * 50 + 15))
+          @gems.push(CollectibleGem.new(gem_frames, x * 50 + 20, y * 50 + 16))
           nil
         else
           nil
@@ -73,6 +79,7 @@ class Map
 
   def update
     @gems.each { |g| g.update}
+    @breakable_tiles.each { |t| t.update }
   end
 
   def draw(camera_x, camera_y, window_width, window_height)
@@ -85,12 +92,28 @@ class Map
       (start_x..end_x).each do |x|
         tile = @tiles[x][y]
 
-        if tile
+        if tile && tile.class != BreakableTile
           @tile_images[tile].draw(
             x * TILE_SIZE - camera_x - 5,
             y * TILE_SIZE - camera_y - 5,
             0
           )
+        end
+        if tile.class == BreakableTile
+          if tile.state == :good
+            tile.image[0].draw(
+              x * TILE_SIZE - camera_x - 5,
+              y * TILE_SIZE - camera_y - 5,
+              0
+            )
+          end
+          if tile.state == :cracked
+            tile.image[1].draw(
+              x * TILE_SIZE - camera_x - 5,
+              y * TILE_SIZE - camera_y - 5,
+              0
+            )
+          end
         end
       end
     end
@@ -104,17 +127,15 @@ class Map
     tile_x = (x / TILE_SIZE).floor
     tile_y = (y / TILE_SIZE).floor
     return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
+    if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class == BreakableTile
+      tile = @tiles[tile_x][tile_y]
+      hits_breakable_tile(tile)
+      @tiles[tile_x][tile_y] = nil if tile.destroyed?
+    end
     @tiles[tile_x][tile_y] != nil
   end
+
+  def hits_breakable_tile(tile)
+    tile.increase_hit_count
+  end
 end
-
-
-# def tile_type(x, y)
-#   tile_x = (x / TILE_SIZE).floor
-#   tile_y = (y / TILE_SIZE).floor
-#   @tiles[tile_x][tile_y] if @tiles[tile_x][tile_y] != nil
-# end
-
-# image_path  = Config::GRASS_TILES_IMAGES[walls.sort] || "assets/tiles/grass_tiles/plain_grass.png"
-# @tile_image = Gosu::Image.new(image_path)
-# end

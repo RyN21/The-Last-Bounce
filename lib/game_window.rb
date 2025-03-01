@@ -4,6 +4,7 @@ require_relative "./paddle"
 require_relative "./ball"
 require_relative "./map"
 require_relative "./collectible_gem"
+require_relative "./breakable_tile"
 
 class GameWindow < Gosu::Window
   WIDTH  = Config::WINDOW_WIDTH

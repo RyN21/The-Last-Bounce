@@ -19,7 +19,8 @@ class Map
       [:corner_tl]    => Gosu::Image.new("assets/tiles/corner_top_left.png"),
       [:corner_tr]    => Gosu::Image.new("assets/tiles/corner_top_right.png"),
       [:lr]           => Gosu::Image.new("assets/tiles/left_right.png"),
-      [:tb]           => Gosu::Image.new("assets/tiles/top_bottom.png")
+      [:tb]           => Gosu::Image.new("assets/tiles/top_bottom.png"),
+      [:bars]           => Gosu::Image.new("assets/tiles/bars.png")
       # [:breakable]    => Gosu::Image.new("assets/tiles/breakable_tile_1.png")
     }
     gem_frames       = Gosu::Image.load_tiles("assets/images/green_gem.png", 16, 16, retro: true)
@@ -63,6 +64,8 @@ class Map
           [:corner_bl]
         when "4"
           [:corner_br]
+        when "j"
+          [:bars]
         when "B"
           tile = BreakableTile.new(x, y)
           @breakable_tiles << tile
@@ -80,6 +83,7 @@ class Map
   def update
     @gems.each { |g| g.update}
     @breakable_tiles.each { |t| t.update }
+    open_finish_line if @gems.empty?
   end
 
   def draw(camera_x, camera_y, window_width, window_height)
@@ -141,6 +145,15 @@ class Map
     end
     @tiles[tile_x][tile_y] != nil
   end
+
+  def open_finish_line
+    @width.times do |x|
+      @height.times do |y|
+        @tiles[x][y] = nil if @tiles[x][y] == [:bars]
+      end
+    end
+  end
+
 
   def hits_breakable_tile(tile)
     tile.increase_hit_count

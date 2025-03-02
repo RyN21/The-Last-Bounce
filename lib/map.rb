@@ -20,7 +20,7 @@ class Map
       [:corner_tr]    => Gosu::Image.new("assets/tiles/corner_top_right.png"),
       [:lr]           => Gosu::Image.new("assets/tiles/left_right.png"),
       [:tb]           => Gosu::Image.new("assets/tiles/top_bottom.png"),
-      [:bars]           => Gosu::Image.new("assets/tiles/bars.png")
+      [:bars]           => Gosu::Image.new("assets/tiles/bars_wood.png")
     }
     gem_frames       = Gosu::Image.load_tiles("assets/images/green_gem.png", 16, 16, retro: true)
     lines            = File.readlines(filename).map { |line| line.chomp }

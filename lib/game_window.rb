@@ -9,7 +9,7 @@ require_relative "./breakable_tile"
 class GameWindow < Gosu::Window
   WIDTH  = Config::WINDOW_WIDTH
   HEIGHT = Config::WINDOW_HEIGHT
-  COLOR  = Gosu::Color.rgba(0, 200, 200, 250)
+  COLOR  = Gosu::Color.rgba(120, 100, 255, 255)
   PADDLE_COLOR  = Gosu::Color.rgba(0, 255, 255, 255)
 
   def initialize
@@ -42,9 +42,9 @@ class GameWindow < Gosu::Window
 
   def draw
     Gosu.draw_rect(0, 0, WIDTH, HEIGHT, COLOR, z = 0)
-    Gosu.translate(-@camera_x * 0.2, 0) { @m1.draw(-150, 130, 0, 4, 4) }
-    Gosu.translate(-@camera_x * 0.5, 0) { @m2.draw(-150, 170, 0, 4, 4) }
-    Gosu.translate(-@camera_x * 0.65, 0) { @m3.draw(-150, 375, 0, 4, 4) }
+    # Gosu.translate(-@camera_x * 0.2, 0) { @m1.draw(-150, 130, 0, 4, 4) }
+    # Gosu.translate(-@camera_x * 0.5, 0) { @m2.draw(-150, 170, 0, 4, 4) }
+    # Gosu.translate(-@camera_x * 0.65, 0) { @m3.draw(-150, 375, 0, 4, 4) }
     @map.draw(@camera_x, @camera_y, WIDTH, HEIGHT)
     Gosu.translate(-@camera_x, -@camera_y) do
       @paddle.draw

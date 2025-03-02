@@ -1,10 +1,8 @@
 class Paddle
-  WIDTH  = 516
-  HEIGHT = 60
-  PADDLE_SCALE = 0.25
-  SCALED_WIDTH = WIDTH * PADDLE_SCALE
-  SCALED_HEIGHT = HEIGHT * 0.25
-  WIDTH_THIRD = SCALED_WIDTH / 3
+  WIDTH  = 150
+  HEIGHT = 15
+  PADDLE_SCALE = 1
+  WIDTH_THIRD = WIDTH / 3
   PADDLE_SPEED = 7
 
   attr_reader :x, :y, :width, :height, :width_third
@@ -13,12 +11,12 @@ class Paddle
     @x            = x
     @y            = y
     @map          = map
-    @width        = SCALED_WIDTH
-    @height       = SCALED_HEIGHT
+    @width        = WIDTH
+    @height       = HEIGHT
     @width_third  = WIDTH_THIRD
     @x_vel_left   = PADDLE_SPEED
     @x_vel_right  = PADDLE_SPEED
-    @paddle       = Gosu::Image.new("assets/images/paddle.png")
+    @paddle       = Gosu::Image.new("assets/images/dark_purple_paddle.png")
   end
 
   def update

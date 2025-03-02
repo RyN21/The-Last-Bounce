@@ -1,22 +1,23 @@
 class Ball
-  WIDTH  = 70
-  HEIGHT = 70
-  RADIUS = 35
+  WIDTH  = 35
+  HEIGHT = 35
+  RADIUS = 35 / 2
   attr_reader :x, :y, :state
   def initialize(x, y, paddle, map)
     @paddle          = paddle
     @map             = map
     @x               = x
     @y               = y
-    @ball_scale      = 0.50
+    @ball_scale      = 1
     @width           = WIDTH * @ball_scale
     @height          = HEIGHT * @ball_scale
     @radius          = RADIUS * @ball_scale
     @gravity_vel     = 0.25
     @bounce_vel      = 13
+    @bounce_factor   = 0.2
     @travel_vel      = 0
     @on_solid_object = false
-    @ball            = Gosu::Image.new("assets/images/ball.png")
+    @ball            = Gosu::Image.new("assets/images/dark_purple_ball.png")
     @state           = :free_fall
     @travel          = :none
   end
@@ -100,23 +101,47 @@ class Ball
     @x += @travel_vel
   end
 
+  def makeBounceBottom(surface)
+    @y = surface - (@height / 2)
+    @gravity_vel *= -1 * (1 - @bounce_factor)
+    @y -= @gravity_vel * @bounce_factor # Add a small immediate bounce
+  end
+
+  def makeBounceTop(surface)
+    @y = surface + (@height / 2)
+    @gravity_vel *= -1 * (1 - @bounce_factor)
+    @y += @gravity_vel * @bounce_factor # Add a small immediate bounce
+  end
+
   def hits_wall
-    if hits_left_wall?
-      @travel_vel = -@travel_vel
-    end
-    if hits_right_wall?
-      @travel_vel = -@travel_vel
+    if hits_left_wall? || hits_right_wall?
+      @travel_vel *= -1 * (1 - @bounce_factor)
+      @x += @travel_vel * @bounce_factor # Add a small immediate bounce
     end
   end
 
+
+  # def hits_wall
+  #   if hits_left_wall?
+  #     @travel_vel = -@travel_vel
+  #   end
+  #   if hits_right_wall?
+  #     @travel_vel = -@travel_vel
+  #   end
+  # end
+
   def hits_paddle?
-    if @y + @height >= @paddle.y  && @y + @height <= @paddle.y + @paddle.height && @x + @width > @paddle.x && @x < @paddle.x + @paddle.width
+    if @y + @height >= @paddle.y &&
+      @y + @height <= @paddle.y + @paddle.height &&
+      @x + @width > @paddle.x &&
+      @x < @paddle.x + @paddle.width
+
       paddle_center = @paddle.x + @paddle.width / 2
       ball_center = @x + @radius
       hit_position = (ball_center - paddle_center) / (@paddle.width / 2.0)
 
-      @travel_vel = hit_position * 5  # Adjust this multiplier to change the maximum horizontal velocity
-      @travel_vel = @travel_vel.clamp(-4, 4)  # Limit the horizontal velocity
+      @travel_vel = hit_position * 5
+      @travel_vel = @travel_vel.clamp(-5, 5)
 
       true
     else
@@ -125,14 +150,14 @@ class Ball
   end
 
   def lands_on_tile?
-    x = @x + @width / 2
+    x = @x + @radius
     y = @y + @height
     # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 
   def hits_ceiling?
-    x = @x + @width / 2
+    x = @x + @radius
     y = @y
     # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
@@ -140,14 +165,14 @@ class Ball
 
   def hits_left_wall?
     x = @x
-    y = @y + @height / 2
+    y = @y + @radius
     # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 
   def hits_right_wall?
     x = @x + @width
-    y = @y + @height / 2
+    y = @y + @radius
     # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end

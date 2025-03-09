@@ -28,10 +28,10 @@ class Paddle
   end
 
   def move_left
-    @x -= @x_vel_left unless @map.hits_tile?(@x + 5, @y)
+    @x -= @x_vel_left unless @map.paddle_hits_tile?(@x + 5, @y)
   end
 
   def move_right
-    @x += @x_vel_right unless @map.hits_tile?(@x + @width + 5, @y)
+    @x += @x_vel_right unless @map.paddle_hits_tile?(@x + @width + 5, @y)
   end
 end

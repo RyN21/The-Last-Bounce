@@ -26,8 +26,12 @@ class Map
     lines            = File.readlines(filename).map { |line| line.chomp }
     @height          = lines.size
     @width           = lines[0].size
+    @hit_sound       = Gosu::Sample.new("assets/sounds/hit.mp3")
+    @hit_brick_sound = Gosu::Sample.new("assets/sounds/cracked.mp3")
+    @gate_open_sound = Gosu::Sample.new("assets/sounds/gate_open.mp3")
     @gems            = []
     @breakable_tiles = []
+    @bar_tiles       = []
     @tiles           = Array.new(@width) do |x|
       Array.new(@height) do |y|
         case lines[y][x, 1]
@@ -64,6 +68,7 @@ class Map
         when "4"
           [:corner_br]
         when "j"
+          @bar_tiles << :bars
           [:bars]
         when "B"
           tile = BreakableTile.new(x, y)
@@ -82,7 +87,7 @@ class Map
   def update
     @gems.each { |g| g.update}
     @breakable_tiles.each { |t| t.update }
-    open_finish_line if @gems.empty?
+    open_finish_line if @gems.empty? && !@bar_tiles.empty?
   end
 
   def draw(camera_x, camera_y, window_width, window_height)
@@ -138,14 +143,31 @@ class Map
     tile_y = (y / TILE_SIZE).floor
     return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
     if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class == BreakableTile
+
       tile = @tiles[tile_x][tile_y]
       hits_breakable_tile(tile)
       @tiles[tile_x][tile_y] = nil if tile.destroyed?
+
+    end
+    if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class != BreakableTile
+      @hit_sound.play
     end
     @tiles[tile_x][tile_y] != nil
+
+  end
+
+  def paddle_hits_tile?(x, y)
+    tile_x = (x / TILE_SIZE).floor
+    tile_y = (y / TILE_SIZE).floor
+    return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
+
+    @tiles[tile_x][tile_y] != nil
+
   end
 
   def open_finish_line
+    @bar_tiles.delete(:bars)
+    @gate_open_sound.play
     @width.times do |x|
       @height.times do |y|
         @tiles[x][y] = nil if @tiles[x][y] == [:bars]
@@ -155,6 +177,7 @@ class Map
 
 
   def hits_breakable_tile(tile)
+    @hit_brick_sound.play
     tile.increase_hit_count
   end
 end

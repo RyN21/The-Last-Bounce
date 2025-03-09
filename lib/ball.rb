@@ -17,7 +17,10 @@ class Ball
     @bounce_factor   = 0.2
     @travel_vel      = 0
     @on_solid_object = false
-    @ball            = Gosu::Image.new("assets/images/dark_purple_ball.png")
+    @ball               = Gosu::Image.new("assets/images/dark_purple_ball.png")
+    @bounce_sound       = Gosu::Sample.new("assets/sounds/bounce.mp3")
+    @collect_gems_sound = Gosu::Sample.new("assets/sounds/collect_coin.mp3")
+
     @state           = :free_fall
     @travel          = :none
   end
@@ -101,17 +104,17 @@ class Ball
     @x += @travel_vel
   end
 
-  def makeBounceBottom(surface)
-    @y = surface - (@height / 2)
-    @gravity_vel *= -1 * (1 - @bounce_factor)
-    @y -= @gravity_vel * @bounce_factor # Add a small immediate bounce
-  end
-
-  def makeBounceTop(surface)
-    @y = surface + (@height / 2)
-    @gravity_vel *= -1 * (1 - @bounce_factor)
-    @y += @gravity_vel * @bounce_factor # Add a small immediate bounce
-  end
+  # def makeBounceBottom(surface)
+  #   @y = surface - (@height / 2)
+  #   @gravity_vel *= -1 * (1 - @bounce_factor)
+  #   @y -= @gravity_vel * @bounce_factor # Add a small immediate bounce
+  # end
+  #
+  # def makeBounceTop(surface)
+  #   @y = surface + (@height / 2)
+  #   @gravity_vel *= -1 * (1 - @bounce_factor)
+  #   @y += @gravity_vel * @bounce_factor # Add a small immediate bounce
+  # end
 
   def hits_wall
     if hits_left_wall? || hits_right_wall?
@@ -142,6 +145,8 @@ class Ball
 
       @travel_vel = hit_position * 5
       @travel_vel = @travel_vel.clamp(-5, 5)
+
+      @bounce_sound.play
 
       true
     else
@@ -179,6 +184,7 @@ class Ball
 
   def collect_gems(gems)
     gems.reject! do |gem|
+      @collect_gems_sound.play if ((gem.x) - (@x + @radius)).abs < 20 && ((gem.y) - (@y + @radius)).abs < 20
       ((gem.x) - (@x + @radius)).abs < 20 && ((gem.y) - (@y + @radius)).abs < 20
     end
   end

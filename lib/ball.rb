@@ -14,6 +14,7 @@ class Ball
     @radius          = RADIUS * @ball_scale
     @gravity_vel     = 0.25
     @bounce_vel      = 13
+    @bounce_factor   = 0.2
     @travel_vel      = 0
     @on_solid_object = false
     @ball               = Gosu::Image.new("assets/images/dark_purple_ball.png")
@@ -106,10 +107,10 @@ class Ball
 
   def hits_wall
     if hits_left_wall?
-      @travel_vel = -@travel_vel
+      @travel_vel = -@travel_vel - @bounce_factor
     end
     if hits_right_wall?
-      @travel_vel = -@travel_vel
+      @travel_vel = -@travel_vel - @bounce_factor
     end
   end
 

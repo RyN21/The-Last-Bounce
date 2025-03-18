@@ -14,12 +14,12 @@ class Ball
     @radius          = RADIUS * @ball_scale
     @gravity_vel     = 0.25
     @bounce_vel      = 13
-    @bounce_factor   = 0.2
     @travel_vel      = 0
     @on_solid_object = false
     @ball               = Gosu::Image.new("assets/images/dark_purple_ball.png")
     @bounce_sound       = Gosu::Sample.new("assets/sounds/bounce.mp3")
     @collect_gems_sound = Gosu::Sample.new("assets/sounds/collect_coin.mp3")
+    @last_time_hit_tile = Gosu.milliseconds
 
     @state           = :free_fall
     @travel          = :none
@@ -104,34 +104,14 @@ class Ball
     @x += @travel_vel
   end
 
-  # def makeBounceBottom(surface)
-  #   @y = surface - (@height / 2)
-  #   @gravity_vel *= -1 * (1 - @bounce_factor)
-  #   @y -= @gravity_vel * @bounce_factor # Add a small immediate bounce
-  # end
-  #
-  # def makeBounceTop(surface)
-  #   @y = surface + (@height / 2)
-  #   @gravity_vel *= -1 * (1 - @bounce_factor)
-  #   @y += @gravity_vel * @bounce_factor # Add a small immediate bounce
-  # end
-
   def hits_wall
-    if hits_left_wall? || hits_right_wall?
-      @travel_vel *= -1 * (1 - @bounce_factor)
-      @x += @travel_vel * @bounce_factor # Add a small immediate bounce
+    if hits_left_wall?
+      @travel_vel = -@travel_vel
+    end
+    if hits_right_wall?
+      @travel_vel = -@travel_vel
     end
   end
-
-
-  # def hits_wall
-  #   if hits_left_wall?
-  #     @travel_vel = -@travel_vel
-  #   end
-  #   if hits_right_wall?
-  #     @travel_vel = -@travel_vel
-  #   end
-  # end
 
   def hits_paddle?
     if @y + @height >= @paddle.y &&
@@ -157,28 +137,24 @@ class Ball
   def lands_on_tile?
     x = @x + @radius
     y = @y + @height
-    # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 
   def hits_ceiling?
     x = @x + @radius
     y = @y
-    # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 
   def hits_left_wall?
     x = @x
     y = @y + @radius
-    # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 
   def hits_right_wall?
     x = @x + @width
     y = @y + @radius
-    # hits_breakable_tile(x, y) if @map.hits_breakable_tile?(x, y)
     @map.hits_tile?(x, y)
   end
 
@@ -189,6 +165,3 @@ class Ball
     end
   end
 end
-
-
-# UPDATE balss travel distance / velocity whenever it hits the paddle

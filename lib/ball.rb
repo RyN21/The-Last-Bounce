@@ -29,11 +29,11 @@ class Ball
   def update
     case @state
     when :free_fall
-      gravity
+      travel_down
     when :bouncing
-      bounce
+      travel_up
     when :hits_ceiling
-      bounce_off_ceiling
+      trave_down_off_ceiling
     end
     hits_wall
     travel
@@ -51,13 +51,36 @@ class Ball
     @travel_vel = -2
   end
 
+  def check_perimeter_collision
+    num_points = 12
+    center_x = @x + @radius
+    center_y = @y + @radius
+    collision = nil
+
+    num_points.times do |i|
+      angle = 2 * Math::PI * i / num_points
+      check_x = center_x + Math.cos(angle) * @radius
+      check_y = center_y + Math.sin(angle) * @radius
+
+      if @map.hits_tile?(check_x, check_y)
+        collision ||= case angle
+        when 0.25*Math::PI...0.75*Math::PI then :bottom
+        when 0.75*Math::PI...1.25*Math::PI then :right
+        when 1.25*Math::PI...1.75*Math::PI then :top
+        else :left
+        end
+      end
+    end
+    collision
+  end
+
   def travel
     @travel = :none if @travel_vel == 0
     @travel = :left if @travel_vel < 0
     @travel = :right if @travel_vel > 0
   end
 
-  def gravity
+  def travel_down
     case @travel
     when :left
       travel_left
@@ -70,7 +93,7 @@ class Ball
     @state = :bouncing if hits_paddle? || lands_on_tile?
   end
 
-  def bounce
+  def travel_up
     case @travel
     when :left
       travel_left
@@ -84,7 +107,7 @@ class Ball
     @state = :hits_ceiling if hits_ceiling?
   end
 
-  def bounce_off_ceiling
+  def trave_down_off_ceiling
     case @travel
     when :left
       travel_left

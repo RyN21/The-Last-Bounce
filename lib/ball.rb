@@ -22,20 +22,14 @@ class Ball
     @collect_gems_sound = Gosu::Sample.new("assets/sounds/collect_coin.mp3")
     @last_time_hit_tile = Gosu.milliseconds
 
+    @collision       = nil
     @state           = :free_fall
     @travel          = :none
   end
 
   def update
-    case @state
-    when :free_fall
-      travel_down
-    when :bouncing
-      travel_up
-    when :hits_ceiling
-      trave_down_off_ceiling
-    end
-    hits_wall
+    handle_state
+    handle_collision_with_tile
     travel
   end
 
@@ -51,11 +45,38 @@ class Ball
     @travel_vel = -2
   end
 
-  def check_perimeter_collision
-    num_points = 12
-    center_x = @x + @radius
-    center_y = @y + @radius
-    collision = nil
+  def handle_state
+    case @state
+    when :free_fall
+      enable_gravity
+    when :bouncing
+      enable_bounce
+    when :hits_ceiling
+      enable_gravity_off_ceiling
+    end
+  end
+
+  def handle_collision_with_tile
+    @collision = perimeter_collision
+    case @collision
+    when :top
+      @y += 3
+      @state = :hits_ceiling
+    when :bottom
+      @y -= 3
+      @state = :bouncing
+    when :left
+      hits_right_side_of_tile
+    when :right
+      hits_left_side_of_tile
+    end
+  end
+
+  def perimeter_collision
+    num_points = 16
+    center_x   = @x + @radius
+    center_y   = @y + @radius
+    collision  = nil
 
     num_points.times do |i|
       angle = 2 * Math::PI * i / num_points
@@ -80,7 +101,15 @@ class Ball
     @travel = :right if @travel_vel > 0
   end
 
-  def travel_down
+  def travel_right
+    @x += @travel_vel
+  end
+
+  def travel_left
+    @x += @travel_vel
+  end
+
+  def enable_gravity
     case @travel
     when :left
       travel_left
@@ -90,10 +119,10 @@ class Ball
     @bounce_vel = 13
     @gravity_vel += 0.1
     @y += @gravity_vel
-    @state = :bouncing if hits_paddle? || lands_on_tile?
+    @state = :bouncing if hits_paddle?
   end
 
-  def travel_up
+  def enable_bounce
     case @travel
     when :left
       travel_left
@@ -104,10 +133,9 @@ class Ball
     @bounce_vel -= 0.25
     @y -= @bounce_vel
     @state = :free_fall if @bounce_vel == 0
-    @state = :hits_ceiling if hits_ceiling?
   end
 
-  def trave_down_off_ceiling
+  def enable_gravity_off_ceiling
     case @travel
     when :left
       travel_left
@@ -120,21 +148,14 @@ class Ball
     @state = :free_fall
   end
 
-  def travel_right
-    @x += @travel_vel
+  def hits_right_side_of_tile
+    @travel_vel = -@travel_vel - @bounce_factor
+    @x -= 3
   end
 
-  def travel_left
-    @x += @travel_vel
-  end
-
-  def hits_wall
-    if hits_left_wall?
-      @travel_vel = -@travel_vel - @bounce_factor
-    end
-    if hits_right_wall?
-      @travel_vel = -@travel_vel - @bounce_factor
-    end
+  def hits_left_side_of_tile
+    @travel_vel = -@travel_vel - @bounce_factor
+    @x += 3
   end
 
   def hits_paddle?
@@ -151,35 +172,10 @@ class Ball
       @travel_vel = @travel_vel.clamp(-5, 5)
 
       @bounce_sound.play
-
       true
     else
       false
     end
-  end
-
-  def lands_on_tile?
-    x = @x + @radius
-    y = @y + @height
-    @map.hits_tile?(x, y)
-  end
-
-  def hits_ceiling?
-    x = @x + @radius
-    y = @y
-    @map.hits_tile?(x, y)
-  end
-
-  def hits_left_wall?
-    x = @x
-    y = @y + @radius
-    @map.hits_tile?(x, y)
-  end
-
-  def hits_right_wall?
-    x = @x + @width
-    y = @y + @radius
-    @map.hits_tile?(x, y)
   end
 
   def collect_gems(gems)

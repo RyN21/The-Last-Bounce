@@ -6,7 +6,6 @@ class BreakableTile
     @hit_count = 0
     @frame     = 0
     @image     = Gosu::Image.load_tiles("assets/tiles/breakable_bricks.png", 50, 50, retro: true)
-    # @image_crk = Gosu::Image.new("assets/tiles/breakable_tile_2.png")
     @state     = :good
   end
 
@@ -28,10 +27,4 @@ class BreakableTile
   def increase_hit_count
     @hit_count += 1
   end
-
-  # def draw(camera_x, camera_y)
-  #   screen_x = @x - camera_x
-  #   screen_y = @y - camera_y
-  #   @tile.draw(screen_x, screen_y, 0, 0, 1, 1)
-  # end
 end

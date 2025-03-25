@@ -60,10 +60,10 @@ class Ball
     @collision = perimeter_collision
     case @collision
     when :top
-      @y += 3
+      @y += 2
       @state = :hits_ceiling
     when :bottom
-      @y -= 3
+      @y -= 2
       @state = :bouncing
     when :left
       hits_right_side_of_tile
@@ -150,12 +150,12 @@ class Ball
 
   def hits_right_side_of_tile
     @travel_vel = -@travel_vel - @bounce_factor
-    @x -= 3
+    @x -= 2
   end
 
   def hits_left_side_of_tile
     @travel_vel = -@travel_vel - @bounce_factor
-    @x += 3
+    @x += 2
   end
 
   def hits_paddle?

@@ -141,9 +141,8 @@ class Map
   def hits_tile?(x, y)
     tile_x = (x / TILE_SIZE).floor
     tile_y = (y / TILE_SIZE).floor
-    return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
+    # return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
     if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class == BreakableTile
-
       tile = @tiles[tile_x][tile_y]
       hits_breakable_tile(tile)
       @tiles[tile_x][tile_y] = nil if tile.destroyed?

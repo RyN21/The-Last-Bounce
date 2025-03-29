@@ -1,30 +1,30 @@
 class BreakableTile
-  attr_reader :hit_count, :image, :state
+  attr_reader :image, :health
+  attr_accessor :last_hit_time
   def initialize(x, y)
     @x = x
     @y = y
-    @hit_count = 0
-    @frame     = 0
-    @image     = Gosu::Image.load_tiles("assets/tiles/breakable_bricks.png", 50, 50, retro: true)
-    @state     = :good
+    @frame           = 0
+    @image           = Gosu::Image.load_tiles("assets/tiles/breakable_bricks.png", 50, 50, retro: true)
+    @hit_brick_sound = Gosu::Sample.new("assets/sounds/cracked.mp3")
+    @health          = 3
+    @last_time_hit   = Gosu.milliseconds
   end
 
-  def update
-    state_update
-  end
-
-  def state_update
-    @state = :good if @hit_count == 0
-    @state = :cracked_1 if @hit_count == 1
-    @state = :cracked_2 if @hit_count == 2
-    @state = :destroyed if @hit_count == 3
-  end
+  def update; end
 
   def destroyed?
-    @state == :destroyed
+    @health <= 0
   end
 
-  def increase_hit_count
-    @hit_count += 1
+  def gets_hit
+    return if destroyed?
+
+    current_time = Gosu.milliseconds
+    if current_time - @last_time_hit > 500
+      @hit_brick_sound.play
+      @health -= 1
+      @last_time_hit = current_time
+    end
   end
 end

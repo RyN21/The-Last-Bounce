@@ -22,17 +22,18 @@ class Map
       [:tb]           => Gosu::Image.new("assets/tiles/top_bottom.png"),
       [:bars]           => Gosu::Image.new("assets/tiles/bars_wood.png")
     }
-    gem_frames       = Gosu::Image.load_tiles("assets/images/green_gem.png", 16, 16, retro: true)
-    lines            = File.readlines(filename).map { |line| line.chomp }
-    @height          = lines.size
-    @width           = lines[0].size
-    @hit_sound       = Gosu::Sample.new("assets/sounds/hit.mp3")
-    @hit_brick_sound = Gosu::Sample.new("assets/sounds/cracked.mp3")
-    @gate_open_sound = Gosu::Sample.new("assets/sounds/gate_open.mp3")
-    @gems            = []
-    @breakable_tiles = []
-    @bar_tiles       = []
-    @tiles           = Array.new(@width) do |x|
+    gem_frames           = Gosu::Image.load_tiles("assets/images/green_gem.png", 16, 16, retro: true)
+    lines                = File.readlines(filename).map { |line| line.chomp }
+    @height              = lines.size
+    @width               = lines[0].size
+    @hit_sound           = Gosu::Sample.new("assets/sounds/hit.mp3")
+    @last_hit_sound_time = Gosu.milliseconds
+    @gate_open_sound     = Gosu::Sample.new("assets/sounds/gate_open.mp3")
+    @gems                = []
+    @breakable_tiles     = []
+    @bar_tiles           = []
+    @tiles_to_remove = []
+    @tiles               = Array.new(@width) do |x|
       Array.new(@height) do |y|
         case lines[y][x, 1]
         when "t"
@@ -88,6 +89,8 @@ class Map
     @gems.each { |g| g.update}
     @breakable_tiles.each { |t| t.update }
     open_finish_line if @gems.empty? && !@bar_tiles.empty?
+    @tiles_to_remove.each { |x, y| @tiles[x][y] = nil }
+    @tiles_to_remove.clear
   end
 
   def draw(camera_x, camera_y, window_width, window_height)
@@ -108,21 +111,21 @@ class Map
           )
         end
         if tile.class == BreakableTile
-          if tile.state == :good
+          if tile.health == 3
             tile.image[0].draw(
               x * TILE_SIZE - camera_x - 5,
               y * TILE_SIZE - camera_y - 5,
               0
             )
           end
-          if tile.state == :cracked_1
+          if tile.health == 2
             tile.image[1].draw(
               x * TILE_SIZE - camera_x - 5,
               y * TILE_SIZE - camera_y - 5,
               0
             )
           end
-          if tile.state == :cracked_2
+          if tile.health == 1
             tile.image[2].draw(
               x * TILE_SIZE - camera_x - 5,
               y * TILE_SIZE - camera_y - 5,
@@ -141,19 +144,64 @@ class Map
   def hits_tile?(x, y)
     tile_x = (x / TILE_SIZE).floor
     tile_y = (y / TILE_SIZE).floor
-    # return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
-    if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class == BreakableTile
-      tile = @tiles[tile_x][tile_y]
-      hits_breakable_tile(tile)
-      @tiles[tile_x][tile_y] = nil if tile.destroyed?
+    return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
 
-    end
-    if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class != BreakableTile
-      @hit_sound.play
-    end
-    @tiles[tile_x][tile_y] != nil
+    tile = @tiles[tile_x][tile_y]
+    return false unless tile
 
+    if tile.is_a?(BreakableTile)
+      tile.gets_hit
+      @tiles_to_remove << [tile_x, tile_y] if tile.destroyed?
+      return true
+    else
+      @hit_sound.play if Gosu.milliseconds - @last_hit_sound_time > 100
+      @last_hit_sound_time = Gosu.milliseconds
+      return true
+    end
+
+    !tile.is_a?(BreakableTile) || !tile.destroyed?
   end
+
+  # def hits_tile?(x, y)
+  # tile_x = (x / TILE_SIZE).floor
+  # tile_y = (y / TILE_SIZE).floor
+  # return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
+  #
+  # tile = @tiles[tile_x][tile_y]
+  # return false unless tile  # Early exit if no tile
+  #
+  # # For breakable tiles
+  # if tile.is_a?(BreakableTile)
+  #   # Add cooldown check (500ms = 0.5 seconds)
+  #   if Gosu.milliseconds - tile.last_hit_time > 500
+  #     tile.register_hit
+  #     @tiles[tile_x][tile_y] = nil if tile.destroyed?
+  #     tile.last_hit_time = Gosu.milliseconds
+  #   end
+  #   true  # Always return true for collision, even during cooldown
+  #   else
+  #     true
+  #   end
+  # end
+
+
+  # def hits_tile?(x, y)
+  #   tile_x = (x / TILE_SIZE).floor
+  #   tile_y = (y / TILE_SIZE).floor
+  #   return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
+  #
+  #   if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class == BreakableTile
+  #     # MAYBE ADD SOME TIME RESTRICTION HERE
+  #     tile = @tiles[tile_x][tile_y]
+  #     hits_breakable_tile(tile)
+  #     @tiles_to_be_removed << [tile_x][tile_y] if tile.destroyed?
+  #
+  #   end
+  #   if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class != BreakableTile
+  #     @hit_sound.play
+  #   end
+  #   @tiles[tile_x][tile_y] != nil
+  # end
 
   def paddle_hits_tile?(x, y)
     tile_x = (x / TILE_SIZE).floor
@@ -161,7 +209,6 @@ class Map
     return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
 
     @tiles[tile_x][tile_y] != nil
-
   end
 
   def open_finish_line
@@ -176,7 +223,6 @@ class Map
 
 
   def hits_breakable_tile(tile)
-    @hit_brick_sound.play
-    tile.increase_hit_count
+    tile.gets_hit
   end
 end

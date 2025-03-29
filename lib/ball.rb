@@ -16,7 +16,6 @@ class Ball
     @bounce_vel      = 13
     @bounce_factor   = 0.2
     @travel_vel      = 0
-    @on_solid_object = false
     @ball               = Gosu::Image.new("assets/images/dark_purple_ball.png")
     @bounce_sound       = Gosu::Sample.new("assets/sounds/bounce.mp3")
     @collect_gems_sound = Gosu::Sample.new("assets/sounds/collect_coin.mp3")
@@ -80,7 +79,7 @@ class Ball
   end
 
   def handle_collision_with_tile
-    return if Gosu.milliseconds - @last_time_hit_tile < 5
+    # return if Gosu.milliseconds - @last_time_hit_tile < 10
     @collision = perimeter_collision
     case @collision
     when :top
@@ -95,7 +94,7 @@ class Ball
       hits_left_side_of_tile
     end
 
-    @last_time_hit_tile = Gosu.milliseconds if @collision
+    # @last_time_hit_tile = Gosu.milliseconds if @collision
   end
 
   def enable_gravity

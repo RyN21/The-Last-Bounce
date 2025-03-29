@@ -162,47 +162,6 @@ class Map
     !tile.is_a?(BreakableTile) || !tile.destroyed?
   end
 
-  # def hits_tile?(x, y)
-  # tile_x = (x / TILE_SIZE).floor
-  # tile_y = (y / TILE_SIZE).floor
-  # return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
-  #
-  # tile = @tiles[tile_x][tile_y]
-  # return false unless tile  # Early exit if no tile
-  #
-  # # For breakable tiles
-  # if tile.is_a?(BreakableTile)
-  #   # Add cooldown check (500ms = 0.5 seconds)
-  #   if Gosu.milliseconds - tile.last_hit_time > 500
-  #     tile.register_hit
-  #     @tiles[tile_x][tile_y] = nil if tile.destroyed?
-  #     tile.last_hit_time = Gosu.milliseconds
-  #   end
-  #   true  # Always return true for collision, even during cooldown
-  #   else
-  #     true
-  #   end
-  # end
-
-
-  # def hits_tile?(x, y)
-  #   tile_x = (x / TILE_SIZE).floor
-  #   tile_y = (y / TILE_SIZE).floor
-  #   return false if tile_x < 0 || tile_y < 0 || tile_y >= @height
-  #
-  #   if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class == BreakableTile
-  #     # MAYBE ADD SOME TIME RESTRICTION HERE
-  #     tile = @tiles[tile_x][tile_y]
-  #     hits_breakable_tile(tile)
-  #     @tiles_to_be_removed << [tile_x][tile_y] if tile.destroyed?
-  #
-  #   end
-  #   if @tiles[tile_x][tile_y] != nil && @tiles[tile_x][tile_y].class != BreakableTile
-  #     @hit_sound.play
-  #   end
-  #   @tiles[tile_x][tile_y] != nil
-  # end
-
   def paddle_hits_tile?(x, y)
     tile_x = (x / TILE_SIZE).floor
     tile_y = (y / TILE_SIZE).floor
@@ -220,7 +179,6 @@ class Map
       end
     end
   end
-
 
   def hits_breakable_tile(tile)
     tile.gets_hit

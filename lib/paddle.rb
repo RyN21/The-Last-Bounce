@@ -19,9 +19,7 @@ class Paddle
     @paddle       = Gosu::Image.new("assets/images/dark_purple_paddle.png")
   end
 
-  def update
-
-  end
+  def update; end
 
   def draw
     @paddle.draw(x, y, 0, PADDLE_SCALE, PADDLE_SCALE)

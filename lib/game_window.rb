@@ -6,16 +6,9 @@ require_relative "./map"
 require_relative "./collectible_gem"
 require_relative "./breakable_tile"
 
-class GameWindow < Gosu::Window
-  WIDTH  = Config::WINDOW_WIDTH
-  HEIGHT = Config::WINDOW_HEIGHT
-  COLOR  = Gosu::Color.rgba(120, 100, 255, 255)
-  PADDLE_COLOR  = Gosu::Color.rgba(0, 255, 255, 255)
-
-  def initialize
-    super WIDTH, HEIGHT
-    self.caption = Config::CAPTION
-    Gosu.enable_undocumented_retrofication
+class GameWindow
+  def initialize(state_manager)
+    @state_manager = state_manager
     @map    = Map.new("assets/maps/1.txt")
     @m1     = Gosu::Image.new("assets/images/mountains_1.png")
     @m2     = Gosu::Image.new("assets/images/mountains_2.png")
@@ -50,6 +43,10 @@ class GameWindow < Gosu::Window
       @paddle.draw
       @ball.draw
     end
+  end
+
+  def button_down(id)
+
   end
 end
 

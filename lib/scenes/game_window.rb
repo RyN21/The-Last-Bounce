@@ -17,12 +17,22 @@ class GameWindow
     @m1            = Gosu::Image.new("assets/images/mountains_1.png")
     @m2            = Gosu::Image.new("assets/images/mountains_2.png")
     @m3            = Gosu::Image.new("assets/images/mountains_3.png")
+    @font          = Gosu::Font.new(30)
     @paddle        = Paddle.new(200, 550, @map)
     @ball          = Ball.new(225, 300, @paddle, @map)
+    @paused        = false
+    @pause_pressed = false
     @camera_x = @camera_y = 0
   end
 
   def update
+    if Gosu.button_down?(Gosu::KB_P) && !@pause_pressed
+      @paused = !@paused
+      @pause_pressed = true
+    end
+    @pause_pressed = false unless Gosu.button_down?(Gosu::KB_P)
+    return if @paused
+
     if Gosu.button_down?(Gosu::KB_LEFT)
       @paddle.move_left
     end
@@ -43,6 +53,7 @@ class GameWindow
     # Gosu.translate(-@camera_x * 0.5, 0) { @m2.draw(-150, 170, 0, 4, 4) }
     # Gosu.translate(-@camera_x * 0.65, 0) { @m3.draw(-150, 375, 0, 4, 4) }
     @map.draw(@camera_x, @camera_y, WIDTH, HEIGHT)
+    @font.draw_text("Game Paused", 225, 300, 0, 2, 2) if @paused
     Gosu.translate(-@camera_x, -@camera_y) do
       @paddle.draw
       @ball.draw

@@ -1,20 +1,24 @@
 require "gosu"
-require_relative "../config/settings"
-require_relative "./paddle"
-require_relative "./ball"
-require_relative "./map"
-require_relative "./collectible_gem"
-require_relative "./breakable_tile"
+require "./config/settings"
+require_relative "../entities/paddle"
+require_relative "../entities/ball"
+require_relative "../map"
+require_relative "../entities/collectible_gem"
+require_relative "../entities/breakable_tile"
 
 class GameWindow
+  WIDTH  = Config::WINDOW_WIDTH
+  HEIGHT = Config::WINDOW_HEIGHT
+  COLOR  = Gosu::Color.rgba(120, 100, 255, 255)
+
   def initialize(state_manager)
     @state_manager = state_manager
-    @map    = Map.new("assets/maps/1.txt")
-    @m1     = Gosu::Image.new("assets/images/mountains_1.png")
-    @m2     = Gosu::Image.new("assets/images/mountains_2.png")
-    @m3     = Gosu::Image.new("assets/images/mountains_3.png")
-    @paddle = Paddle.new(200, 550, @map)
-    @ball   = Ball.new(225, 300, @paddle, @map)
+    @map           = Map.new("assets/maps/1.txt")
+    @m1            = Gosu::Image.new("assets/images/mountains_1.png")
+    @m2            = Gosu::Image.new("assets/images/mountains_2.png")
+    @m3            = Gosu::Image.new("assets/images/mountains_3.png")
+    @paddle        = Paddle.new(200, 550, @map)
+    @ball          = Ball.new(225, 300, @paddle, @map)
     @camera_x = @camera_y = 0
   end
 
@@ -46,8 +50,9 @@ class GameWindow
   end
 
   def button_down(id)
-
+    case id
+    when Gosu::KB_ESCAPE
+      @state_manager.switch_to(Menu.new(@state_manager))
+    end
   end
 end
-
-GameWindow.new.show

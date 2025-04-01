@@ -1,7 +1,7 @@
 require "gosu"
 require_relative "lib/state_manager"
-require_relative "lib/game_window"
-require_relative "lib/menu"
+require_relative "lib/scenes/game_window"
+require_relative "lib/scenes/menu"
 
 class Main < Gosu::Window
   WIDTH   = Config::WINDOW_WIDTH

@@ -1,6 +1,6 @@
 require "gosu"
-require_relative "menu"
-require_relative "game_window"
+require_relative "scenes/menu"
+require_relative "scenes/game_window"
 
 class StateManager
   def initialize(window)

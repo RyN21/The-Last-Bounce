@@ -22,12 +22,15 @@ class GameWindow
     @ball          = Ball.new(225, 300, @paddle, @map)
     @paused        = false
     @pause_pressed = false
+    @paused_menu   = false
+    @menu_options  = ["Continue", "Restart", "Quit"]
     @camera_x = @camera_y = 0
   end
 
   def update
     if Gosu.button_down?(Gosu::KB_P) && !@pause_pressed
       @paused = !@paused
+      @paused_menu   = @paused
       @pause_pressed = true
     end
     @pause_pressed = false unless Gosu.button_down?(Gosu::KB_P)

@@ -22,7 +22,6 @@ class GameWindow
     @paddle         = Paddle.new(200, 550, @map)
     @ball           = Ball.new(225, 300, @paddle, @map)
     @paused         = false
-    @pause_pressed  = false
     @paused_menu    = false
     @menu_options   = ["Continue", "Restart", "Quit"]
     @menu_opt_index = 0
@@ -30,12 +29,6 @@ class GameWindow
   end
 
   def update
-    if Gosu.button_down?(Gosu::KB_P) && !@pause_pressed
-      @paused = !@paused
-      @paused_menu   = @paused
-      @pause_pressed = true
-    end
-    @pause_pressed = false unless Gosu.button_down?(Gosu::KB_P)
     return if @paused
 
     if Gosu.button_down?(Gosu::KB_LEFT)
@@ -72,8 +65,10 @@ class GameWindow
 
   def button_down(id)
     case id
-    when Gosu::KB_ESCAPE
-      @state_manager.switch_to(Menu.new(@state_manager))
+    when Gosu::KB_SPACE
+      @paused = !@paused
+      @paused_menu   = @paused
+      @pause_pressed = true
     end
     if @paused
       case id

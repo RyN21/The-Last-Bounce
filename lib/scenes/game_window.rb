@@ -92,11 +92,12 @@ class GameWindow
     when 0
       @paused = false
     when 1
-      @paused = false
+      @state_manager.switch_to(GameWindow.new(@state_manager))
     when 2
-      @paused = false
+      @state_manager.switch_to(Menu.new(@state_manager))
     end
   end
+
 end
 
 

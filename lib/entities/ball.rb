@@ -36,6 +36,10 @@ class Ball
     @ball.draw(@x, @y, 0, @ball_scale, @ball_scale)
   end
 
+  def lose?
+    @lives == 0
+  end
+
   def reset_ball(x)
     @x = x
     @y = 100

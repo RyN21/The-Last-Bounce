@@ -32,7 +32,7 @@ class GameWindow
 
   def update
     return if @paused
-    return if @ball.lives == 0
+    return if @ball.lose?
 
     if Gosu.button_down?(Gosu::KB_LEFT)
       @paddle.move_left
@@ -65,8 +65,7 @@ class GameWindow
         @font.draw_text(option, 275, 275 + shift, 1, 1, 1, color)
       end
     end
-
-    if @ball.lives == 0
+    if @ball.lose?
       Gosu.draw_rect(200, 150, 400, 350, MENUCOLOR)
       @font.draw_text("You Lose", 230, 180, 0, 2, 2)
       @lose_options.each_with_index do |option, index|
@@ -75,8 +74,6 @@ class GameWindow
         @font.draw_text(option, 275, 275 + shift, 1, 1, 1, color)
       end
     end
-
-
   end
 
   def button_down(id)
@@ -96,7 +93,7 @@ class GameWindow
         handle_menu_optino_selection
       end
     end
-    if @ball.lives == 0
+    if @ball.lose?
       case id
       when Gosu::KB_UP
         @lose_opt_index = (@lose_opt_index - 1) % @lose_options.size

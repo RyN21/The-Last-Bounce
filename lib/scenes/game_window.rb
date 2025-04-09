@@ -24,12 +24,15 @@ class GameWindow
     @paused         = false
     @paused_menu    = false
     @menu_options   = ["Continue", "Restart", "Quit"]
+    @lose_options   = ["Try Again", "Quit"]
     @menu_opt_index = 0
+    @lose_opt_index = 0
     @camera_x = @camera_y = 0
   end
 
   def update
     return if @paused
+    return if @ball.lives == 0
 
     if Gosu.button_down?(Gosu::KB_LEFT)
       @paddle.move_left
@@ -48,6 +51,7 @@ class GameWindow
   def draw
     Gosu.draw_rect(0, 0, WIDTH, HEIGHT, COLOR, z = 0)
     @map.draw(@camera_x, @camera_y, WIDTH, HEIGHT)
+    @font.draw_text("Lives: #{@ball.lives}", 25, 10, 0, 0.75, 0.75)
     Gosu.translate(-@camera_x, -@camera_y) do
       @paddle.draw
       @ball.draw
@@ -61,6 +65,18 @@ class GameWindow
         @font.draw_text(option, 275, 275 + shift, 1, 1, 1, color)
       end
     end
+
+    if @ball.lives == 0
+      Gosu.draw_rect(200, 150, 400, 350, MENUCOLOR)
+      @font.draw_text("You Lose", 230, 180, 0, 2, 2)
+      @lose_options.each_with_index do |option, index|
+        shift = index * 50
+        color = index == @lose_opt_index ? Gosu::Color.argb(0xff_ff00ff) : Gosu::Color::WHITE
+        @font.draw_text(option, 275, 275 + shift, 1, 1, 1, color)
+      end
+    end
+
+
   end
 
   def button_down(id)
@@ -80,6 +96,16 @@ class GameWindow
         handle_menu_optino_selection
       end
     end
+    if @ball.lives == 0
+      case id
+      when Gosu::KB_UP
+        @lose_opt_index = (@lose_opt_index - 1) % @lose_options.size
+      when Gosu::KB_DOWN
+        @lose_opt_index = (@lose_opt_index + 1) % @lose_options.size
+      when Gosu::KB_RETURN
+        handle_lose_optino_selection
+      end
+    end
   end
 
   def handle_menu_optino_selection
@@ -93,6 +119,14 @@ class GameWindow
     end
   end
 
+  def handle_lose_optino_selection
+    case @lose_opt_index
+    when 0
+      @state_manager.switch_to(GameWindow.new(@state_manager))
+    when 1
+      @state_manager.switch_to(Menu.new(@state_manager))
+    end
+  end
 end
 
 

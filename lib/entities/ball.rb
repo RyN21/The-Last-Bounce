@@ -2,7 +2,7 @@ class Ball
   WIDTH  = 35
   HEIGHT = 35
   RADIUS = 35 / 2
-  attr_reader :x, :y, :state
+  attr_reader :x, :y, :state, :lives
   def initialize(x, y, paddle, map)
     @paddle          = paddle
     @map             = map
@@ -20,7 +20,7 @@ class Ball
     @bounce_sound       = Gosu::Sample.new("assets/sounds/bounce.mp3")
     @collect_gems_sound = Gosu::Sample.new("assets/sounds/collect_coin.mp3")
     @last_time_hit_tile = Gosu.milliseconds
-
+    @lives           = 5
     @collision       = nil
     @state           = :free_fall
     @travel          = :none
@@ -42,6 +42,7 @@ class Ball
     @gravity_vel = 0.25
     @travel = :left
     @travel_vel = -2
+    @lives -= 1
   end
 
   def handle_state

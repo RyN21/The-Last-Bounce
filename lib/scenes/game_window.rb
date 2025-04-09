@@ -14,7 +14,7 @@ class GameWindow
 
   def initialize(state_manager)
     @state_manager  = state_manager
-    @map            = Map.new("assets/maps/1.txt")
+    @map            = Map.new("assets/maps/level_2.txt")
     @m1             = Gosu::Image.new("assets/images/mountains_1.png")
     @m2             = Gosu::Image.new("assets/images/mountains_2.png")
     @m3             = Gosu::Image.new("assets/images/mountains_3.png")

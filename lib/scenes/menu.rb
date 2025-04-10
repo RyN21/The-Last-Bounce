@@ -10,6 +10,7 @@ class Menu
 
   def draw
     @font.draw_text("Press ENTER to play", 250, 250, 0, 1, 1)
+    @levels = [1, 2, 3, 4]
   end
 
   def button_down(id)

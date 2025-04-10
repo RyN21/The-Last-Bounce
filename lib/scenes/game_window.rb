@@ -13,20 +13,23 @@ class GameWindow
   MENUCOLOR = Gosu::Color.rgba(10, 10, 10, 225)
 
   def initialize(state_manager)
-    @state_manager  = state_manager
-    @map            = Map.new("assets/maps/level_2.txt")
-    @m1             = Gosu::Image.new("assets/images/mountains_1.png")
-    @m2             = Gosu::Image.new("assets/images/mountains_2.png")
-    @m3             = Gosu::Image.new("assets/images/mountains_3.png")
-    @font           = Gosu::Font.new(30)
-    @paddle         = Paddle.new(200, 550, @map)
-    @ball           = Ball.new(225, 300, @paddle, @map)
-    @paused         = false
-    @paused_menu    = false
-    @menu_options   = ["Continue", "Restart", "Quit"]
-    @lose_options   = ["Try Again", "Quit"]
-    @menu_opt_index = 0
-    @lose_opt_index = 0
+    @state_manager   = state_manager
+    @level           = 3
+    @map             = Map.new("assets/maps/level_#{@level}.txt")
+    @m1              = Gosu::Image.new("assets/images/mountains_1.png")
+    @m2              = Gosu::Image.new("assets/images/mountains_2.png")
+    @m3              = Gosu::Image.new("assets/images/mountains_3.png")
+    @font            = Gosu::Font.new(30)
+    @paddle          = Paddle.new(200, 550, @map)
+    @ball            = Ball.new(225, 300, @paddle, @map)
+    @paused          = false
+    @paused_menu     = false
+    @menu_options    = ["Continue", "Restart", "Select Level", "Quit"]
+    @lose_options    = ["Try Again", "Select Level", "Quit"]
+    @levels          = [1, 2, 3, 4]
+    @menu_opt_index  = 0
+    @lose_opt_index  = 0
+    @level_opt_index = 0
     @camera_x = @camera_y = 0
   end
 
@@ -52,6 +55,8 @@ class GameWindow
     Gosu.draw_rect(0, 0, WIDTH, HEIGHT, COLOR, z = 0)
     @map.draw(@camera_x, @camera_y, WIDTH, HEIGHT)
     @font.draw_text("Lives: #{@ball.lives}", 25, 10, 0, 0.75, 0.75)
+    @font.draw_text("The Last Bounce", 325, 10, 0, 0.75, 0.75)
+    @font.draw_text("Level: #{@level}", 700, 10, 0, 0.75, 0.75)
     Gosu.translate(-@camera_x, -@camera_y) do
       @paddle.draw
       @ball.draw
@@ -106,21 +111,25 @@ class GameWindow
   end
 
   def handle_menu_optino_selection
-    case @menu_opt_index
-    when 0
+    case @menu_options[@menu_opt_index]
+    when "Continue"
       @paused = false
-    when 1
+    when "Restart"
       @state_manager.switch_to(GameWindow.new(@state_manager))
-    when 2
+    when "Select Level"
+      # @state_manager.switch_to(GameWindow.new(@state_manager))
+    when "Quit"
       @state_manager.switch_to(Menu.new(@state_manager))
     end
   end
 
   def handle_lose_optino_selection
-    case @lose_opt_index
-    when 0
+    case @lose_options[@lose_opt_index]
+    when "Try Again"
       @state_manager.switch_to(GameWindow.new(@state_manager))
-    when 1
+    when "Select Level"
+      @state_manager.switch_to(GameWindow.new(@state_manager))
+    when "Quit"
       @state_manager.switch_to(Menu.new(@state_manager))
     end
   end

@@ -6,7 +6,7 @@ class Menu
   def initialize(state_manager)
     @state_manager  = state_manager
     @font           = Gosu::Font.new(30)
-    @menu_options   = ["Play", "Select Level", "Quit"]
+    @menu_options   = ["Play", "Select Level", "Exit"]
     @menu_opt_index = 0
     @levels         = [1, 2, 3, 4]
   end
@@ -42,7 +42,7 @@ class Menu
       @state_manager.switch_to(GameWindow.new(@state_manager))
     when "Select Level"
 
-    when "Quit"
+    when "Exit"
       exit
     end
   end

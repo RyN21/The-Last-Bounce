@@ -24,8 +24,8 @@ class GameWindow
     @ball            = Ball.new(225, 300, @paddle, @map)
     @paused          = false
     @paused_menu     = false
-    @menu_options    = ["Continue", "Restart", "Select Level", "Main Menu"]
-    @lose_options    = ["Try Again", "Select Level", "Main Menu"]
+    @menu_options    = ["Continue", "Restart", "Select Level", "Quit"]
+    @lose_options    = ["Try Again", "Select Level", "Quit"]
     @levels          = [1, 2, 3, 4]
     @menu_opt_index  = 0
     @lose_opt_index  = 0

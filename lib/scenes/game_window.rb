@@ -12,9 +12,9 @@ class GameWindow
   COLOR  = Gosu::Color.rgba(120, 100, 255, 255)
   MENUCOLOR = Gosu::Color.rgba(10, 10, 10, 225)
 
-  def initialize(state_manager)
+  def initialize(state_manager, level)
     @state_manager   = state_manager
-    @level           = 3
+    @level           = level
     @map             = Map.new("assets/maps/level_#{@level}.txt")
     @m1              = Gosu::Image.new("assets/images/mountains_1.png")
     @m2              = Gosu::Image.new("assets/images/mountains_2.png")

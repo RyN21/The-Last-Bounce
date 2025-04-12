@@ -40,6 +40,10 @@ class Ball
     @lives == 0
   end
 
+  def win?
+    @x + @width > @map.width * 50 - 15
+  end
+
   def reset_ball(x)
     @x = x
     @y = 100

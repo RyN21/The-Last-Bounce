@@ -69,17 +69,17 @@ class Menu
   end
 
   def handle_level_screen_options
-    case @levels[@level_index]
-    when 1
+    case @level_index
+    when 0
       @level = 1
       @level_screen = false
-    when 2
+    when 1
       @level = 2
       @level_screen = false
-    when 3
+    when 2
       @level = 3
       @level_screen = false
-    when 4
+    when 3
       @level = 4
       @level_screen = false
     end

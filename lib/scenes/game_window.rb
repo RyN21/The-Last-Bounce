@@ -77,15 +77,6 @@ class GameWindow
         @font.draw_text(option, 275, 275 + shift, 1, 1, 1, color)
       end
     end
-    if @level_screen
-      Gosu.draw_rect(200, 150, 400, 350, MENUCOLOR)
-      @font.draw_text("Select Level", 230, 180, 0, 2, 2)
-      @levels.each_with_index do |level, index|
-        shift = index * 50
-        color = index == @level_index ? Gosu::Color.argb(0xff_ff00ff) : Gosu::Color::WHITE
-        @font.draw_text(level, 275, 250 + shift, 1, 1, 1, color)
-      end
-    end
     if @ball.lose? && !@level_screen
       Gosu.draw_rect(200, 150, 400, 350, MENUCOLOR)
       @font.draw_text("You Lose", 230, 180, 0, 2, 2)
@@ -104,6 +95,15 @@ class GameWindow
         @font.draw_text(option, 275, 275 + shift, 1, 1, 1, color)
       end
     end
+    if @level_screen
+      Gosu.draw_rect(200, 150, 400, 350, MENUCOLOR)
+      @font.draw_text("Select Level", 230, 180, 0, 2, 2)
+      @levels.each_with_index do |level, index|
+        shift = index * 50
+        color = index == @level_index ? Gosu::Color.argb(0xff_ff00ff) : Gosu::Color::WHITE
+        @font.draw_text(level, 275, 250 + shift, 1, 1, 1, color)
+      end
+    end
   end
 
   def button_down(id)
@@ -117,10 +117,8 @@ class GameWindow
       case id
       when Gosu::KB_UP
         @menu_opt_index = (@menu_opt_index - 1) % @menu_options.size
-        # @level_index = (@level_index - 1) % @levels.size if @level_screen
       when Gosu::KB_DOWN
         @menu_opt_index = (@menu_opt_index + 1) % @menu_options.size
-        # @level_index = (@level_index + 1) % @levels.size if @level_screen
       when Gosu::KB_RETURN
         handle_menu_option_selection
       end
@@ -164,7 +162,12 @@ class GameWindow
     when "Restart"
       @state_manager.switch_to(GameWindow.new(@state_manager, @level))
     when "Select Level"
+      if @paused
+        @level_screen = true
+        @level_index = 0
+      end
       @level_screen = true
+      @level_index = 0
     when "Quit"
       @state_manager.switch_to(Menu.new(@state_manager))
     end
@@ -176,6 +179,7 @@ class GameWindow
       @state_manager.switch_to(GameWindow.new(@state_manager, @level))
     when "Select Level"
       @level_screen = true
+      @level_index = 0
     when "Quit"
       @state_manager.switch_to(Menu.new(@state_manager))
     end
@@ -189,6 +193,7 @@ class GameWindow
       @state_manager.switch_to(GameWindow.new(@state_manager, level))
     when "Select Level"
       @level_screen = true
+      @level_index = 0
     when "Quit"
       @state_manager.switch_to(Menu.new(@state_manager))
     end
@@ -196,19 +201,19 @@ class GameWindow
 
   def handle_level_screen_options
     case @levels[@level_index]
-    when 0
+    when 1
       @level = 1
       @level_screen = false
       @state_manager.switch_to(GameWindow.new(@state_manager, @level))
-    when 1
+    when 2
       @level = 2
       @level_screen = false
       @state_manager.switch_to(GameWindow.new(@state_manager, @level))
-    when 2
+    when 3
       @level = 3
       @level_screen = false
       @state_manager.switch_to(GameWindow.new(@state_manager, @level))
-    when 3
+    when 4
       @level = 4
       @level_screen = false
       @state_manager.switch_to(GameWindow.new(@state_manager, @level))

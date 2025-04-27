@@ -164,7 +164,7 @@ class GameWindow
     when "Select Level"
       level_select
     when "Quit"
-      @state_manager.switch_to(Menu.new(@state_manager))
+      quit
     end
   end
 
@@ -175,7 +175,7 @@ class GameWindow
     when "Select Level"
       level_select
     when "Quit"
-      @state_manager.switch_to(Menu.new(@state_manager))
+      quit
     end
   end
 
@@ -188,7 +188,7 @@ class GameWindow
     when "Select Level"
       level_select
     when "Quit"
-      @state_manager.switch_to(Menu.new(@state_manager))
+      quit
     end
   end
 
@@ -220,6 +220,10 @@ class GameWindow
   def level_select
     @level_screen = true
     @level_index = 0
+  end
+
+  def quit
+    @state_manager.switch_to(Menu.new(@state_manager))
   end
 end
 

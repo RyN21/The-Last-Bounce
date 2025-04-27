@@ -29,7 +29,7 @@ class GameWindow
     @win_options     = ["Next Level", "Select Level", "Quit"]
     # @unlocked_levels = [1]
     # @locked_levels   = [2, 3, 4]
-    @levels          = [1, 2, 3, 4, "Back"]
+    @level_options          = [1, 2, 3, 4, "Back"]
     @level_index     = 0
     @level_screen    = false
     @menu_opt_index  = 0
@@ -98,7 +98,7 @@ class GameWindow
     if @level_screen
       Gosu.draw_rect(200, 150, 400, 350, MENUCOLOR)
       @font.draw_text("Select Level", 230, 180, 0, 2, 2)
-      @levels.each_with_index do |level, index|
+      @level_options.each_with_index do |level, index|
         shift = index * 50
         color = index == @level_index ? Gosu::Color.argb(0xff_ff00ff) : Gosu::Color::WHITE
         @font.draw_text(level, 275, 250 + shift, 1, 1, 1, color)
@@ -116,9 +116,9 @@ class GameWindow
     if @paused && !@level_screen
       case id
       when Gosu::KB_UP
-        @menu_opt_index = (@menu_opt_index - 1) % @menu_options.size
+        cycle_up("menu")
       when Gosu::KB_DOWN
-        @menu_opt_index = (@menu_opt_index + 1) % @menu_options.size
+        cycle_down("menu")
       when Gosu::KB_RETURN
         handle_menu_option_selection
       end
@@ -126,9 +126,9 @@ class GameWindow
     if @level_screen
       case id
       when Gosu::KB_UP
-        @level_index = (@level_index - 1) % @levels.size
+        cycle_up("level")
       when Gosu::KB_DOWN
-        @level_index = (@level_index + 1) % @levels.size
+        cycle_down("level")
       when Gosu::KB_RETURN
         handle_level_screen_options
       end
@@ -136,9 +136,9 @@ class GameWindow
     if @ball.lose? && !@level_screen
       case id
       when Gosu::KB_UP
-        @lose_opt_index = (@lose_opt_index - 1) % @lose_options.size
+        cycle_up("lose")
       when Gosu::KB_DOWN
-        @lose_opt_index = (@lose_opt_index + 1) % @lose_options.size
+        cycle_down("lose")
       when Gosu::KB_RETURN
         handle_lose_option_selection
       end
@@ -146,9 +146,9 @@ class GameWindow
     if @ball.win? && !@level_screen
       case id
       when Gosu::KB_UP
-        @win_opt_index = (@win_opt_index - 1) % @win_options.size
+        cycle_up("win")
       when Gosu::KB_DOWN
-        @win_opt_index = (@win_opt_index + 1) % @win_options.size
+        cycle_down("win")
       when Gosu::KB_RETURN
         handle_win_option_selection
       end
@@ -193,7 +193,7 @@ class GameWindow
   end
 
   def handle_level_screen_options
-    case @levels[@level_index]
+    case @level_options[@level_index]
     when 1
       @level = 1
       @level_screen = false
@@ -215,7 +215,11 @@ class GameWindow
     end
   end
 
+
+
   private
+
+
 
   def level_select
     @level_screen = true
@@ -228,6 +232,32 @@ class GameWindow
 
   def set_level(level)
     @state_manager.switch_to(GameWindow.new(@state_manager, level))
+  end
+
+  def cycle_up(options)
+    case options
+    when "menu"
+      @menu_opt_index = (@menu_opt_index - 1) % @menu_options.size
+    when "win"
+      @win_opt_index = (@win_opt_index - 1) % @win_options.size
+    when "lose"
+      @lose_opt_index = (@lose_opt_index - 1) % @lose_options.size
+    when "level"
+      @level_index = (@level_index - 1) % @level_options.size
+    end
+  end
+
+  def cycle_down(options)
+    case options
+    when "menu"
+      @menu_opt_index = (@menu_opt_index + 1) % @menu_options.size
+    when "win"
+      @win_opt_index = (@win_opt_index + 1) % @win_options.size
+    when "lose"
+      @lose_opt_index = (@lose_opt_index + 1) % @lose_options.size
+    when "level"
+      @level_index = (@level_index + 1) % @level_options.size
+    end
   end
 end
 

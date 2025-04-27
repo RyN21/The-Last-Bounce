@@ -160,7 +160,7 @@ class GameWindow
     when "Continue"
       @paused = false
     when "Restart"
-      @state_manager.switch_to(GameWindow.new(@state_manager, @level))
+      set_level(@level)
     when "Select Level"
       level_select
     when "Quit"
@@ -171,7 +171,7 @@ class GameWindow
   def handle_lose_option_selection
     case @lose_options[@lose_opt_index]
     when "Try Again"
-      @state_manager.switch_to(GameWindow.new(@state_manager, @level))
+      set_level(@level)
     when "Select Level"
       level_select
     when "Quit"
@@ -184,7 +184,7 @@ class GameWindow
     case @win_options[@win_opt_index]
     when "Next Level"
       level += 1
-      @state_manager.switch_to(GameWindow.new(@state_manager, level))
+      set_level(level)
     when "Select Level"
       level_select
     when "Quit"
@@ -197,19 +197,19 @@ class GameWindow
     when 1
       @level = 1
       @level_screen = false
-      @state_manager.switch_to(GameWindow.new(@state_manager, @level))
+      set_level(@level)
     when 2
       @level = 2
       @level_screen = false
-      @state_manager.switch_to(GameWindow.new(@state_manager, @level))
+      set_level(@level)
     when 3
       @level = 3
       @level_screen = false
-      @state_manager.switch_to(GameWindow.new(@state_manager, @level))
+      set_level(@level)
     when 4
       @level = 4
       @level_screen = false
-      @state_manager.switch_to(GameWindow.new(@state_manager, @level))
+      set_level(@level)
     when "Back"
       @level_screen = false
     end
@@ -224,6 +224,10 @@ class GameWindow
 
   def quit
     @state_manager.switch_to(Menu.new(@state_manager))
+  end
+
+  def set_level(level)
+    @state_manager.switch_to(GameWindow.new(@state_manager, level))
   end
 end
 

@@ -162,12 +162,7 @@ class GameWindow
     when "Restart"
       @state_manager.switch_to(GameWindow.new(@state_manager, @level))
     when "Select Level"
-      if @paused
-        @level_screen = true
-        @level_index = 0
-      end
-      @level_screen = true
-      @level_index = 0
+      level_select
     when "Quit"
       @state_manager.switch_to(Menu.new(@state_manager))
     end
@@ -178,8 +173,7 @@ class GameWindow
     when "Try Again"
       @state_manager.switch_to(GameWindow.new(@state_manager, @level))
     when "Select Level"
-      @level_screen = true
-      @level_index = 0
+      level_select
     when "Quit"
       @state_manager.switch_to(Menu.new(@state_manager))
     end
@@ -192,8 +186,7 @@ class GameWindow
       level += 1
       @state_manager.switch_to(GameWindow.new(@state_manager, level))
     when "Select Level"
-      @level_screen = true
-      @level_index = 0
+      level_select
     when "Quit"
       @state_manager.switch_to(Menu.new(@state_manager))
     end
@@ -220,6 +213,13 @@ class GameWindow
     when "Back"
       @level_screen = false
     end
+  end
+
+  private
+
+  def level_select
+    @level_screen = true
+    @level_index = 0
   end
 end
 

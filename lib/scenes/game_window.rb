@@ -189,7 +189,6 @@ class GameWindow
       level += 1
       set_level(level)
     when "Select Level"
-      require "pry"; binding.pry
       level_select
     when "Quit"
       quit
@@ -198,24 +197,13 @@ class GameWindow
 
   def handle_level_screen_options
     case @level_options[@level_index]
-    when 1
-      @level = 1
+    when 1..4
+      set_level(@level_options[@level_index])
       @level_screen = false
-      set_level(@level)
-    when 2
-      @level = 2
-      @level_screen = false
-      set_level(@level)
-    when 3
-      @level = 3
-      @level_screen = false
-      set_level(@level)
-    when 4
-      @level = 4
-      @level_screen = false
-      set_level(@level)
+      @paused = false
     when "Back"
       @level_screen = false
+      @menu_opt_index = 0
     end
   end
 
@@ -228,6 +216,7 @@ class GameWindow
   def level_select
     @level_screen = true
     @level_index = 0
+    @paused = true unless @ball.win? || @ball.lose?
   end
 
   def quit

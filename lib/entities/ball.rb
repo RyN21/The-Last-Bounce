@@ -20,7 +20,7 @@ class Ball
     @bounce_sound       = Gosu::Sample.new("assets/sounds/bounce.mp3")
     @collect_gems_sound = Gosu::Sample.new("assets/sounds/collect_coin.mp3")
     @last_time_hit_tile = Gosu.milliseconds
-    @lives           = 5
+    @lives           = 1
     @collision       = nil
     @state           = :free_fall
     @travel          = :none

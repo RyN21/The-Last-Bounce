@@ -109,20 +109,9 @@ class GameWindow
   def button_down(id)
     case id
     when Gosu::KB_SPACE
-      @paused = !@paused
-      @paused_menu   = @paused
-      @pause_pressed = true
+      @paused = !@paused unless @level_screen || @ball.lose? || @ball.win?
     end
-    if @paused && !@level_screen
-      case id
-      when Gosu::KB_UP
-        cycle_up("menu")
-      when Gosu::KB_DOWN
-        cycle_down("menu")
-      when Gosu::KB_RETURN
-        handle_menu_option_selection
-      end
-    end
+
     if @level_screen
       case id
       when Gosu::KB_UP
@@ -132,8 +121,23 @@ class GameWindow
       when Gosu::KB_RETURN
         handle_level_screen_options
       end
-    end
-    if @ball.lose? && !@level_screen
+    elsif @paused
+      case id
+      when Gosu::KB_UP
+        cycle_up("menu") if !@level_screen
+        cycle_up("level") if @level_screen
+      when Gosu::KB_DOWN
+        cycle_down("menu") if !@level_screen
+        cycle_down("level") if @level_screen
+      when Gosu::KB_RETURN
+        case @level_screen
+        when false
+          handle_menu_option_selection
+        when true
+          handle_level_screen_options
+        end
+      end
+    elsif @ball.lose?
       case id
       when Gosu::KB_UP
         cycle_up("lose")
@@ -142,8 +146,7 @@ class GameWindow
       when Gosu::KB_RETURN
         handle_lose_option_selection
       end
-    end
-    if @ball.win? && !@level_screen
+    elsif @ball.win?
       case id
       when Gosu::KB_UP
         cycle_up("win")
@@ -186,6 +189,7 @@ class GameWindow
       level += 1
       set_level(level)
     when "Select Level"
+      require "pry"; binding.pry
       level_select
     when "Quit"
       quit
